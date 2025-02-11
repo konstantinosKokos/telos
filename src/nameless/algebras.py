@@ -120,7 +120,7 @@ Product = algebra_factory(
     join=lambda x, y: x + y - x * y,
     neg=lambda x: 1 - x,
     running_meet=lambda x: torch.cumprod(x, dim=-1),
-    forall=lambda x: torch.prod(x, -1)[..., None]
+    forall=lambda x: torch.prod(x, -1),
 )
 Lukasiewicz = algebra_factory(
     top=torch.tensor(1.),
