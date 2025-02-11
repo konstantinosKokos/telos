@@ -1,4 +1,4 @@
 # WIP
 
-Just playing around with TL formulas.
+Just playing around with LTL formulas and evaluation semantics in PyTorch.
 
