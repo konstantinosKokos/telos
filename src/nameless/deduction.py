@@ -5,6 +5,8 @@ import torch
 from torch import Tensor
 from typing import Callable as Fn, Type
 
+from functools import lru_cache
+
 
 class Trace(dict[Variable, Tensor]):
     def __init__(self, mapping: dict[Variable, Tensor]):
@@ -49,7 +51,7 @@ def model(algebra: Type[Algebra]) -> Fn[[Judgement], Tensor]:
             case AbstractBottom():
                 return algebra.bottom()
             case Variable(x):
-                return j.trace[Variable(x)][0]
+                return j.trace[Variable(x)][..., 0]
             case Negation(x):
                 return algebra.neg(evaluate(Judgement(j.trace, x)))
             case Next(x):
