@@ -43,7 +43,8 @@ def subexprs(f: Formula) -> set[Formula]:
         case _: raise ValueError
 
 
-def model(algebra: Type[Algebra]) -> Fn[[Judgement], Tensor]:
+def model(algebra: Type[Algebra], cache_size: int = 128) -> Fn[[Judgement], Tensor]:
+    @lru_cache(maxsize=cache_size)
     def evaluate(j: Judgement) -> Tensor:
         match j.conclusion:
             case AbstractTop():
