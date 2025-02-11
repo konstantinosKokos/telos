@@ -62,7 +62,7 @@ def model(algebra: Type[Algebra], cache_size: int = 128) -> Fn[[Judgement], Tens
             case Until(l, r):
                 rs = torch.stack([evaluate(Judgement(suffix(j.trace, i), r)) for i in range(len(j.trace))], dim=-1)
                 ls = torch.stack([evaluate(Judgement(suffix(j.trace, i), l)) for i in range(len(j.trace))], dim=-1)
-                return algebra.any(algebra.meet(algebra.running_meet(ls), rs))
+                return algebra.exists(algebra.meet(algebra.running_meet(ls), rs))
             case _:
                 raise ValueError
     return evaluate
