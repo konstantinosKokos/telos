@@ -15,11 +15,14 @@ class Formula(ABC):
     def __hash__(self) -> int:
         return formula_hash(self)
 
+
 class AbstractTop(Formula):
     ...
 
+
 class AbstractBottom(Formula):
     ...
+
 
 class Variable(Formula):
     __match_args__ = ('name',)

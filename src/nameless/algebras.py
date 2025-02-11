@@ -100,6 +100,7 @@ class Product(Algebra):
     @classmethod
     def all(cls, x: Tensor) -> Tensor: return torch.prod(x, -1)
 
+
 class Lukasiewicz(Algebra):
     @classmethod
     def top(cls) -> Tensor: return torch.tensor([1.])
@@ -111,6 +112,7 @@ class Lukasiewicz(Algebra):
     def join(cls, x: Tensor, y: Tensor) -> Tensor: return torch.clamp(x + y, max=1.)
     @classmethod
     def neg(cls, x: Tensor) -> Tensor: return 1 - x
+
 
 class Hamacher(Algebra):
     @classmethod
