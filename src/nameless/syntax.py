@@ -54,6 +54,22 @@ class Disjunction(Formula):
         self.right = right
 
 
+class Conjunction(Formula):
+    __match_args__ = ('left', 'right')
+
+    def __init__(self, left: Formula, right: Formula):
+        self.left = left
+        self.right = right
+
+
+class Implies(Formula):
+    __match_args__ = ('left', 'right')
+
+    def __init__(self, left: Formula, right: Formula):
+        self.left = left
+        self.right = right
+
+
 class Until(Formula):
     __match_args__ = ('left', 'right')
 
@@ -68,12 +84,6 @@ def eventually(f: Formula) -> Formula:
 def always(f: Formula) -> Formula:
     return Negation(eventually(Negation(f)))
 
-def implies(f: Formula, g: Formula) -> Formula:
-    return Disjunction(Negation(f), g)
-
-def conjunction(f: Formula, g: Formula) -> Formula:
-    return Negation(Disjunction(Negation(f), Negation(g)))
-
 
 def formula_repr(f: Formula) -> str:
     def par(g: Formula) -> str:
@@ -87,6 +97,8 @@ def formula_repr(f: Formula) -> str:
         case Negation(x): return f'¬ {par(x)}'
         case Next(x): return f'𝓧 {par(x)}'
         case Disjunction(l, r): return f'{par(l)} ∨ {par(r)}'
+        case Conjunction(l, r): f'{par(l)} ∧ {par(r)}'
+        case Implies(l, r): f'{par(l)} → {(par(r))}'
         case Until(l, r): return f'{par(l)} 𝒰 {par(r)}'
         case _: raise ValueError
 
@@ -98,6 +110,8 @@ def formula_eq(left: Formula, right: Formula) -> bool:
         case Variable(x), Variable(y): return x == y
         case Next(x), Next(y): return formula_eq(x, y)
         case Disjunction(l1, r1), Disjunction(l2, r2): return all(map(formula_eq, (l1, r1), (l2, r2)))
+        case Conjunction(l1, r1), Conjunction(l2, r2): return all(map(formula_eq, (l1, r1), (l2, r2)))
+        case Implies(l1, r1), Implies(l2, r2): return all(map(formula_eq, (l1, r1), (l2, r2)))
         case Until(l1, r1), Until(l2, r2): return all(map(formula_eq, (l1, r1), (l2, r2)))
         case _: return False
 
@@ -107,7 +121,7 @@ def free(f: Formula) -> set[Variable]:
         case AbstractTop() | AbstractBottom(): return set()
         case Variable(x): return {Variable(x)}
         case Negation(x) | Next(x): return free(x)
-        case Disjunction(l, r) | Until(l, r): return free(l) | free(r)
+        case Disjunction(l, r) | Until(l, r) | Conjunction(l, r) | Implies(l, r): return free(l) | free(r)
         case _: raise ValueError
 
 
@@ -119,5 +133,7 @@ def formula_hash(f: Formula) -> int:
         case Negation(x): return hash(('n', formula_hash(x)))
         case Next(x): return hash(('x', formula_hash(x)))
         case Disjunction(l, r): return hash(('d', formula_hash(l), formula_hash(r)))
+        case Conjunction(l, r): return hash(('c', formula_hash(l), formula_hash(r)))
+        case Implies(l, r): return hash(('i', formula_hash(l), formula_hash(r)))
         case Until(l, r): return hash(('u', formula_hash(l), formula_hash(r)))
         case _: raise ValueError

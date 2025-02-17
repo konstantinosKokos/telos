@@ -33,6 +33,7 @@ class Properties:
     involution: bool
     de_morgan: bool
     complementarity: bool
+    residuation: bool
 
     def __repr__(self) -> str:
         lines = [f"\t{name:<25}: {value}" for name, value in self.__dict__.items()]
@@ -55,6 +56,9 @@ class Algebra[T](ABC):
     @classmethod
     @abstractmethod
     def join(cls, x: Tensor, y: Tensor) -> Tensor: ...
+    @classmethod
+    @abstractmethod
+    def implies(cls, x: Tensor, y: Tensor) -> Tensor: ...
     @classmethod
     @abstractmethod
     def neg(cls, x: Tensor) -> Tensor: ...
@@ -94,7 +98,7 @@ def check(algebra: Type[Algebra], test_size: int = 50) -> Properties:
     else:
         x, y, z = torch.rand(test_size * 3, 1).chunk(3, dim=0)
 
-    meet, join, neg = algebra.meet, algebra.join, algebra.neg
+    meet, join, implies, neg = algebra.meet, algebra.join, algebra.implies, algebra.neg
     top, bottom = algebra.top(), algebra.bottom()
 
     meet_commutative = commutative(meet)(x, y)
@@ -120,6 +124,10 @@ def check(algebra: Type[Algebra], test_size: int = 50) -> Properties:
         (torch.allclose(meet(x, neg(x)), bottom),
          torch.allclose(join(x, neg(x)), top))
     )
+    residuation = not any(
+        (torch.any(torch.gt(meet(x, y),  z)).item(),
+         torch.any(torch.lt(implies(x, z), y)).item())
+    )
     return Properties(
         meet_commutative=meet_commutative,
         join_commutative=join_commutative,
@@ -131,16 +139,18 @@ def check(algebra: Type[Algebra], test_size: int = 50) -> Properties:
         distributivity=distributivity,
         involution=involution,
         de_morgan=de_morgan,
-        complementarity=complementarity
+        complementarity=complementarity,
+        residuation=residuation
     )
 
 
 def algebra_factory(
-        _dtype: Type[bool] | Type[float],
+        domain: Type[bool] | Type[float],
         top: Tensor,
         bottom: Tensor,
         meet: Fn[[Tensor, Tensor], Tensor],
         join: Fn[[Tensor, Tensor], Tensor],
+        implies: Fn[[Tensor, Tensor], Tensor],
         neg: Fn[[Tensor], Tensor],
         running_meet: Fn[[Tensor], Tensor] | None = None,
         running_join: Fn[[Tensor], Tensor] | None = None,
@@ -157,9 +167,8 @@ def algebra_factory(
     if forall is None:
         forall = fold(meet, top)
 
-    class Instance(Algebra[_dtype], ABC):
-        dtype = _dtype
-
+    class Instance(Algebra[domain], ABC):
+        dtype = domain
         @classmethod
         def top(cls) -> Tensor: return top
         @classmethod
@@ -168,6 +177,8 @@ def algebra_factory(
         def meet(cls, x: Tensor, y: Tensor) -> Tensor: return meet(x, y)
         @classmethod
         def join(cls, x: Tensor, y: Tensor) -> Tensor: return join(x, y)
+        @classmethod
+        def implies(cls, x: Tensor, y: Tensor) -> Tensor: return implies(x, y)
         @classmethod
         def neg(cls, x: Tensor) -> Tensor: return neg(x)
         @classmethod
@@ -183,11 +194,12 @@ def algebra_factory(
 
 
 Boolean = algebra_factory(
-    _dtype=bool,
+    domain=bool,
     top=torch.tensor(True),
     bottom=torch.tensor(False),
     meet=torch.bitwise_and,
     join=torch.bitwise_or,
+    implies=lambda x, y: torch.bitwise_or(torch.logical_not(x), y),
     neg=torch.bitwise_not,
     running_meet=lambda x: torch.cumprod(x, dim=-1),
     running_join=lambda x: torch.cummax(x, dim=-1).values,
@@ -195,11 +207,12 @@ Boolean = algebra_factory(
     forall=lambda x: torch.all(x, dim=-1)
 )
 Goedel = algebra_factory(
-    _dtype=float,
+    domain=float,
     top=torch.tensor(1.),
     bottom=torch.tensor(0.),
     meet=torch.minimum,
     join=torch.maximum,
+    implies=lambda x, y: torch.where(torch.le(x, y), torch.tensor(1.0), y),
     neg=lambda x: 1 - x,
     running_meet=lambda x: torch.cummin(x, dim=-1).values,
     running_join=lambda x: torch.cummax(x, dim=-1).values,
@@ -207,28 +220,31 @@ Goedel = algebra_factory(
     forall=lambda x: torch.min(x, dim=-1).values
 )
 Product = algebra_factory(
-    _dtype=float,
+    domain=float,
     top=torch.tensor(1.),
     bottom=torch.tensor(0.),
     meet=torch.mul,
     join=lambda x, y: x + y - x * y,
+    implies=lambda x, y: torch.where(torch.eq(x, 0), torch.tensor(1.0), torch.minimum(torch.tensor(1.0), y/x)),
     neg=lambda x: 1 - x,
     running_meet=lambda x: torch.cumprod(x, dim=-1),
     forall=lambda x: torch.prod(x, -1),
 )
 Lukasiewicz = algebra_factory(
-    _dtype=float,
+    domain=float,
     top=torch.tensor(1.),
     bottom=torch.tensor(0.),
     meet=lambda x, y: torch.clamp(x + y - 1, min=0.),
     join=lambda x, y: torch.clamp(x + y, max=1.),
+    implies=lambda x, y: torch.minimum(torch.tensor(1.0), 1 - x + y),
     neg=lambda x: 1 - x
 )
 Hamacher = algebra_factory(
-    _dtype=float,
+    domain=float,
     top=torch.tensor(1.),
     bottom=torch.tensor(0.),
     meet=lambda x, y: torch.where(torch.bitwise_or(torch.eq(x, 0), torch.eq(y, 0)) , 0., (x + y) / (x + y - x * y)),
     join=lambda x, y: (x + y) / ( 1 + x + y),
+    implies=lambda x, y: torch.where(torch.eq(x, 0), torch.tensor(1.0), (1 - x + y) / (1 + y)),
     neg=lambda x: 1 - x,
 )

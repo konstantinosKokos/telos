@@ -59,6 +59,10 @@ def model(algebra: Type[Algebra], cache_size: int = 128) -> Fn[[Judgement], Tens
                 return evaluate(Judgement(suffix(j.trace, 1), x))
             case Disjunction(l, r):
                 return algebra.join(evaluate(Judgement(j.trace, l)), evaluate(Judgement(j.trace, r)))
+            case Conjunction(l, r):
+                return algebra.meet(evaluate(Judgement(j.trace, l)), evaluate(Judgement(j.trace, r)))
+            case Implies(l, r):
+                return algebra.implies(evaluate(Judgement(j.trace, l)), evaluate(Judgement(j.trace, r)))
             case Until(l, r):
                 rs = torch.stack([evaluate(Judgement(suffix(j.trace, i), r)) for i in range(len(j.trace))], dim=-1)
                 ls = torch.stack([evaluate(Judgement(suffix(j.trace, i), l)) for i in range(len(j.trace))], dim=-1)
