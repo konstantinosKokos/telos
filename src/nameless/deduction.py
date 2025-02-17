@@ -21,7 +21,7 @@ class Trace(dict[Variable, Tensor]):
         return set(self.keys())
 
     def __len__(self) -> int:
-        return len(next(iter(self.values())))
+        return next(iter(self.values())).size(-1)
 
 
 class Judgement:
