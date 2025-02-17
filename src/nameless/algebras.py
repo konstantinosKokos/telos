@@ -178,13 +178,8 @@ def algebra_factory(
         def exists(cls, x: Tensor) -> Tensor: return exists(x)
         @classmethod
         def forall(cls, x: Tensor) -> Tensor: return forall(x)
-
-    def adorn(algebra: Type[Instance]) -> Type[Instance]:
-        class Adorned(algebra, ABC):
-            properties: Properties = check(algebra)
-        return Adorned
-
-    return adorn(Instance)
+    Instance.properties = check(Instance)
+    return Instance
 
 
 Boolean = algebra_factory(
