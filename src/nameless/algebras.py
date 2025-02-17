@@ -189,8 +189,8 @@ def algebra_factory(
 
 Boolean = algebra_factory(
     _dtype=bool,
-    top=torch.tensor([True]),
-    bottom=torch.tensor([False]),
+    top=torch.tensor(True),
+    bottom=torch.tensor(False),
     meet=torch.bitwise_and,
     join=torch.bitwise_or,
     neg=torch.bitwise_not,
