@@ -6,7 +6,7 @@ from .algebras import Algebra
 
 import torch
 from torch import Tensor
-from typing import Callable as Fn, Type
+from typing import Callable as Fn
 
 from functools import lru_cache
 
@@ -46,14 +46,14 @@ def subexprs(f: Formula) -> set[Formula]:
         case _: raise ValueError
 
 
-def model(algebra: Type[Algebra], cache_size: int = 128) -> Fn[[Judgement], Tensor]:
+def model(algebra: Algebra, cache_size: int = 128) -> Fn[[Judgement], Tensor]:
     @lru_cache(maxsize=cache_size)
     def evaluate(j: Judgement) -> Tensor:
         match j.conclusion:
             case AbstractTop():
-                return algebra.top()
+                return algebra.top
             case AbstractBottom():
-                return algebra.bottom()
+                return algebra.bottom
             case Variable(x):
                 return j.trace[Variable(x)][..., 0]
             case Negation(x):
