@@ -97,8 +97,8 @@ def formula_repr(f: Formula) -> str:
         case Negation(x): return f'¬ {par(x)}'
         case Next(x): return f'𝓧 {par(x)}'
         case Disjunction(l, r): return f'{par(l)} ∨ {par(r)}'
-        case Conjunction(l, r): f'{par(l)} ∧ {par(r)}'
-        case Implies(l, r): f'{par(l)} → {(par(r))}'
+        case Conjunction(l, r): return f'{par(l)} ∧ {par(r)}'
+        case Implies(l, r): return f'{par(l)} → {(par(r))}'
         case Until(l, r): return f'{par(l)} 𝒰 {par(r)}'
         case _: raise ValueError
 
