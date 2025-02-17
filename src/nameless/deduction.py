@@ -1,4 +1,7 @@
-from .syntax import Formula, Variable, AbstractTop, AbstractBottom, Negation, Next, Disjunction, Until, free
+from .syntax import (
+    Formula, Variable, AbstractTop, AbstractBottom,
+    Negation, Next, Disjunction, Conjunction, Implies, Until, free
+)
 from .algebras import Algebra
 
 import torch
