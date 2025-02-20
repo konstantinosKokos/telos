@@ -85,6 +85,10 @@ def always(f: Formula) -> Formula:
     return Negation(eventually(Negation(f)))
 
 
+def iff(left: Formula, right: Formula) -> Formula:
+    return Conjunction(Implies(left, right), Implies(right, left))
+
+
 def formula_repr(f: Formula) -> str:
     def par(g: Formula) -> str:
         s = formula_repr(g)
