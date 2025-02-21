@@ -3,7 +3,6 @@ from .syntax import (
     Negation, Next, Disjunction, Conjunction, Implies, Until, free
 )
 from .algebras import Algebra
-
 import torch
 from torch import Tensor
 from typing import Callable as Fn
@@ -55,20 +54,32 @@ def model(algebra: Algebra, cache_size: int = 128) -> Fn[[Judgement], Tensor]:
             case AbstractBottom():
                 return algebra.bottom
             case Variable(x):
+                #try:
                 return j.trace[Variable(x)][..., 0]
+                # except IndexError:
+                #     return j.trace[Variable(x)].squeeze(-1)
             case Negation(x):
                 return algebra.neg(evaluate(Judgement(j.trace, x)))
             case Next(x):
                 return evaluate(Judgement(suffix(j.trace, 1), x))
             case Disjunction(l, r):
-                return algebra.join(evaluate(Judgement(j.trace, l)), evaluate(Judgement(j.trace, r)))
+                r_ = evaluate(Judgement(j.trace, r))
+                l_ = evaluate(Judgement(j.trace, l))
+                return algebra.join(l_, r_)
             case Conjunction(l, r):
-                return algebra.meet(evaluate(Judgement(j.trace, l)), evaluate(Judgement(j.trace, r)))
+                r_ = evaluate(Judgement(j.trace, r))
+                l_ = evaluate(Judgement(j.trace, l))
+                return algebra.meet(l_, r_)
             case Implies(l, r):
                 return algebra.implies(evaluate(Judgement(j.trace, l)), evaluate(Judgement(j.trace, r)))
             case Until(l, r):
-                rs = torch.stack([evaluate(Judgement(suffix(j.trace, i), r)) for i in range(len(j.trace))], dim=-1)
-                ls = torch.stack([evaluate(Judgement(suffix(j.trace, i), l)) for i in range(len(j.trace))], dim=-1)
+                # rs = []
+                # for i in range(len(j.trace)):
+                #     jud = Judgement(suffix(j.trace, i), r)
+                #     r_ = evaluate(jud)
+                #     rs.append(r_)
+                rs = torch.stack([evaluate(Judgement(suffix(j.trace, i), r)) for i in range(len(j.trace)-1)], dim=-1)
+                ls = torch.stack([evaluate(Judgement(suffix(j.trace, i), l)) for i in range(len(j.trace)-1)], dim=-1)
                 return algebra.exists(algebra.meet(algebra.running_meet(ls), rs))
             case _:
                 raise ValueError
