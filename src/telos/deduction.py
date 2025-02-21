@@ -55,7 +55,7 @@ def model(algebra: Algebra, cache_size: int = 128) -> Fn[[Judgement], Tensor]:
             case AbstractBottom():
                 return algebra.bottom
             case Variable(x):
-                return j.trace[Variable(x)][..., 0]
+                return j.trace[Variable(x)][..., 0] if len(j.trace) else algebra.bottom
             case Negation(x):
                 return algebra.neg(evaluate(Judgement(j.trace, x)))
             case Next(x):
