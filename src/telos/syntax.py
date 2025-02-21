@@ -119,7 +119,7 @@ def formula_eq(left: Formula, right: Formula) -> bool:
         case Until(l1, r1), Until(l2, r2): return all(map(formula_eq, (l1, r1), (l2, r2)))
         case _: return False
 
-
+#NOTE: what does this do?
 def free(f: Formula) -> set[Variable]:
     match f:
         case AbstractTop() | AbstractBottom(): return set()

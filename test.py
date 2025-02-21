@@ -4,8 +4,8 @@ from src.telos.syntax import Variable, Next, Disjunction, Implies, eventually
 from src.telos.algebras.goedel import Goedel
 
 x, y, z, w = map(Variable, 'xyzw')
-batch_size = 10
-trace_size = 20
+batch_size = 1
+trace_size = 2
 
 trace = Trace({
     x: torch.rand(batch_size, trace_size, requires_grad=True),

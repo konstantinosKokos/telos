@@ -73,13 +73,22 @@ def model(algebra: Algebra, cache_size: int = 128) -> Fn[[Judgement], Tensor]:
             case Implies(l, r):
                 return algebra.implies(evaluate(Judgement(j.trace, l)), evaluate(Judgement(j.trace, r)))
             case Until(l, r):
-                # rs = []
-                # for i in range(len(j.trace)):
-                #     jud = Judgement(suffix(j.trace, i), r)
-                #     r_ = evaluate(jud)
-                #     rs.append(r_)
-                rs = torch.stack([evaluate(Judgement(suffix(j.trace, i), r)) for i in range(len(j.trace)-1)], dim=-1)
-                ls = torch.stack([evaluate(Judgement(suffix(j.trace, i), l)) for i in range(len(j.trace)-1)], dim=-1)
+                # TODO: debug this, suffix does not check the first element in the trace, 
+                # and checks one extra element in the end
+                # (i.e. returns a tensor [batch_size, 0] in the last iteration)
+                rs, ls = [], []
+                for i in range(len(j.trace)):
+                    s_ = suffix(j.trace, i)
+                    jud_r = Judgement(s_, r)
+                    jud_l = Judgement(s_, l)
+                    ev_r = evaluate(jud_r)
+                    ev_l = evaluate(jud_l)
+                    rs.append(ev_r)
+                    ls.append(ev_l)
+                rs = torch.stack(rs, dim=-1)
+                ls = torch.stack(ls, dim=-1)
+                # rs = torch.stack([evaluate(Judgement(suffix(j.trace, i), r)) for i in range(len(j.trace))], dim=-1)
+                # ls = torch.stack([evaluate(Judgement(suffix(j.trace, i), l)) for i in range(len(j.trace))], dim=-1)
                 return algebra.exists(algebra.meet(algebra.running_meet(ls), rs))
             case _:
                 raise ValueError
