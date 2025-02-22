@@ -45,6 +45,15 @@ class Algebra(ABC, Module):
     def forall(self, x: Tensor) -> Tensor: return fold(self.meet, self.top)(x)
 
 
+class FuzzyBase(Algebra, ABC):
+    dtype = float
+
+    def __init__(self):
+        super().__init__()
+        self.register_buffer('_top', torch.tensor(1.))
+        self.register_buffer('_bottom', torch.tensor(0.))
+
+
 def commutative(fn: Fn[[Tensor, Tensor], Tensor]) -> Fn[[Tensor, Tensor], bool]:
     def f(x: Tensor, y: Tensor) -> bool:
         return torch.allclose(fn(x, y), fn(y, x))
@@ -59,6 +68,7 @@ def idempotent(fn: Fn[[Tensor, Tensor], Tensor]) -> Fn[[Tensor], bool]:
     def f(x: Tensor) -> bool:
         return torch.allclose(fn(x, x), x)
     return f
+
 
 @dataclass(eq=True)
 class Properties:

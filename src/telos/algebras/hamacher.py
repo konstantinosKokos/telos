@@ -1,16 +1,12 @@
 import torch
 from torch import Tensor
 
-from .base import Algebra, Properties
+from .base import FuzzyBase, Properties
 
 
-class Hamacher(Algebra):
-    dtype = float
-
+class Hamacher(FuzzyBase):
     def __init__(self):
         super().__init__()
-        self.register_buffer('_top', torch.tensor(1.))
-        self.register_buffer('_bottom', torch.tensor(0.))
         self.properties = Properties.check(self)
 
     # todo: check these.

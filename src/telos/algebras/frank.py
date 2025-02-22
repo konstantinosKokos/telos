@@ -1,17 +1,14 @@
 import torch
 from torch import Tensor
 
-from .base import Algebra, Properties
+from .base import FuzzyBase, Properties
 
 
-class Frank(Algebra):
-    dtype = float
+class Frank(FuzzyBase):
     p: Tensor
 
     def __init__(self, p: float):
         super().__init__()
-        self.register_buffer('_top', torch.tensor(1.))
-        self.register_buffer('_bottom', torch.tensor(0.))
         self.register_buffer('p', torch.tensor(p))
         self.properties = Properties.check(self)
 

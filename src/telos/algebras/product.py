@@ -1,16 +1,12 @@
 import torch
 from torch import Tensor
 
-from .base import Algebra, Properties
+from .base import FuzzyBase, Properties
 
 
-class Product(Algebra):
-    dtype = float
-
+class Product(FuzzyBase):
     def __init__(self):
         super().__init__()
-        self.register_buffer('_top', torch.tensor(1.))
-        self.register_buffer('_bottom', torch.tensor(0.))
         self.properties = Properties.check(self)
 
     def meet(self, x: Tensor, y: Tensor) -> Tensor:
