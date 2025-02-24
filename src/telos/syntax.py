@@ -141,3 +141,11 @@ def formula_hash(f: Formula) -> int:
         case Implies(l, r): return hash(('i', formula_hash(l), formula_hash(r)))
         case Until(l, r): return hash(('u', formula_hash(l), formula_hash(r)))
         case _: raise ValueError
+
+
+def subexprs(f: Formula) -> set[Formula]:
+    match f:
+        case AbstractTop() | AbstractBottom() | Variable(_): return {f}
+        case Next(x) | Negation(x): return subexprs(x) | {f}
+        case Disjunction(l, r) | Until(l, r) | Implies(l, r) | Conjunction(l, r): return subexprs(l) | subexprs(r) | {f}
+        case _: raise ValueError

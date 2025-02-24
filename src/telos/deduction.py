@@ -38,14 +38,6 @@ def suffix(trace: Trace, i: int) -> Trace:
     return Trace({var: vals[..., i:] for var, vals in trace.items()})
 
 
-def subexprs(f: Formula) -> set[Formula]:
-    match f:
-        case AbstractTop() | AbstractBottom() | Variable(_): return {f}
-        case Next(x) | Negation(x): return subexprs(x) | {f}
-        case Disjunction(l, r) | Until(l, r): return subexprs(l) | subexprs(r) | {f}
-        case _: raise ValueError
-
-
 def model(algebra: Algebra, cache_size: int = 128) -> Fn[[Judgement], Tensor]:
     @lru_cache(maxsize=cache_size)
     def evaluate(j: Judgement) -> Tensor:
