@@ -22,36 +22,16 @@ def fold(fn: Fn[[Tensor, Tensor], Tensor], initial: Tensor) -> Fn[[Tensor], Tens
     return f
 
 
-def span_dynamic(
-        fn: Fn[[Tensor, Tensor], Tensor],
-        initial: Tensor,
-        cache_size: int | None = None
+def span(
+        fn: [[Tensor], Tensor],
+        neutral: Tensor,
+        bottom: Tensor
 ) -> Fn[[Tensor], Tensor]:
     def f(x: Tensor) -> Tensor:
         n = x.size(-1)
-
-        @lru_cache(maxsize=cache_size)
-        def span_result(i: int, j: int) -> Tensor:
-            if i == j:
-                return x[..., i]
-            split_idx = i + (j - i + 1) // 2
-            return fn(span_result(i, split_idx - 1), span_result(split_idx, j))
-        return torch.stack(
-            [torch.stack(
-                [span_result(i, j) if i <= j else initial.expand_as(x[..., 0]) for j in range(n)], dim=-1) for i in range(n)
-            ],
-            dim=-2
-        )
-    return f
-
-
-def span_vectorized(fn: [[Tensor], Tensor], initial: Tensor) -> Fn[[Tensor], Tensor]:
-    def f(x: Tensor) -> Tensor:
-        n = x.size(-1)
         mask = torch.triu(torch.ones(n, n, dtype=x.dtype, device=x.device)).bool()
-        return fn(torch.where(mask, x[..., None, :], initial)) * mask
+        return torch.where(mask, fn(torch.where(mask, x[..., None, :], neutral)), bottom)
     return f
-
 
 
 class Algebra(ABC, Module):
@@ -75,17 +55,8 @@ class Algebra(ABC, Module):
     def running_join(self, x: Tensor) -> Tensor: return scan(self.join)(x)
     def exists(self, x: Tensor) -> Tensor: return fold(self.join, self.bottom)(x)
     def forall(self, x: Tensor) -> Tensor: return fold(self.meet, self.top)(x)
-
-    def span_meet(self, x: Tensor) -> Tensor:
-        if self.properties.meet_associative and self.properties.meet_commutative:
-            return span_vectorized(self.running_meet, self.top)(x)
-        return span_dynamic(self.meet, self.bottom)(x)
-
-    def span_join(self, x: Tensor) -> Tensor:
-        if self.properties.join_associative and self.properties.join_commutative:
-            return span_vectorized(self.running_join, self.bottom)(x)
-        return self.span_join_dynamic(x)
-
+    def span_meet(self, x: Tensor) -> Tensor: return span(self.running_meet, self.top, self.bottom)(x)
+    def span_join(self, x: Tensor) -> Tensor: return span(self.running_join, self.bottom, self.bottom)(x)
 
 
 class FuzzyBase(Algebra, ABC):
