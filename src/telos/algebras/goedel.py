@@ -18,9 +18,6 @@ class Goedel(FuzzyBase):
     def implies(self, x: Tensor, y: Tensor) -> Tensor:
         return torch.where(torch.le(x, y), torch.tensor(1.0), y)
 
-    def neg(self, x: Tensor) -> Tensor:
-        return 1 - x
-
     def running_meet(self, x: Tensor) -> Tensor:
         return torch.cummin(x, dim=-1).values
 

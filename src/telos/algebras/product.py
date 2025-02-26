@@ -18,9 +18,6 @@ class Product(FuzzyBase):
     def implies(self, x: Tensor, y: Tensor) -> Tensor:
         return torch.where(x == 0, self.top, torch.minimum(self.top, y/x))
 
-    def neg(self, x: Tensor) -> Tensor:
-        return 1 - x
-
     def running_meet(self, x: Tensor) -> Tensor:
         return torch.cumprod(x, dim=-1)
 

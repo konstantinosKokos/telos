@@ -17,6 +17,3 @@ class Lukasiewicz(FuzzyBase):
 
     def implies(self, x: Tensor, y: Tensor) -> Tensor:
         return torch.minimum(self.top, 1 - x + y)
-
-    def neg(self, x: Tensor) -> Tensor:
-        return 1 - x

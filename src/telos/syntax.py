@@ -81,6 +81,7 @@ class Until(Formula):
 def eventually(f: Formula) -> Formula:
     return Until(AbstractTop(), f)
 
+
 def always(f: Formula) -> Formula:
     return Negation(eventually(Negation(f)))
 
@@ -92,7 +93,7 @@ def iff(left: Formula, right: Formula) -> Formula:
 def formula_repr(f: Formula) -> str:
     def par(g: Formula) -> str:
         s = formula_repr(g)
-        return s if isinstance(g, (Variable, Next, Until)) else f'({s})'
+        return s if isinstance(g, (Variable, Next)) else f'({s})'
 
     match f:
         case AbstractTop(): return '⊤'
@@ -109,15 +110,21 @@ def formula_repr(f: Formula) -> str:
 
 def formula_eq(left: Formula, right: Formula) -> bool:
     match left, right:
-        case AbstractTop(), AbstractTop(): return True
-        case AbstractBottom(), AbstractBottom(): return True
-        case Variable(x), Variable(y): return x == y
-        case Next(x), Next(y): return formula_eq(x, y)
-        case Disjunction(l1, r1), Disjunction(l2, r2): return all(map(formula_eq, (l1, r1), (l2, r2)))
-        case Conjunction(l1, r1), Conjunction(l2, r2): return all(map(formula_eq, (l1, r1), (l2, r2)))
-        case Implies(l1, r1), Implies(l2, r2): return all(map(formula_eq, (l1, r1), (l2, r2)))
-        case Until(l1, r1), Until(l2, r2): return all(map(formula_eq, (l1, r1), (l2, r2)))
-        case _: return False
+        case AbstractTop(), AbstractTop():
+            return True
+        case AbstractBottom(), AbstractBottom():
+            return True
+        case Variable(x), Variable(y):
+            return x == y
+        case Next(x), Next(y):
+            return formula_eq(x, y)
+        case (Disjunction(l1, r1), Disjunction(l2, r2)) \
+             | (Conjunction(l1, r1), Conjunction(l2, r2)) \
+             | (Implies(l1, r1), Implies(l2, r2)) \
+             | (Until(l1, r1), Until(l2, r2)):
+            return all(map(formula_eq, (l1, r1), (l2, r2)))
+        case _:
+            return False
 
 
 def free(f: Formula) -> set[Variable]:
@@ -145,7 +152,23 @@ def formula_hash(f: Formula) -> int:
 
 def subexprs(f: Formula) -> set[Formula]:
     match f:
-        case AbstractTop() | AbstractBottom() | Variable(_): return {f}
-        case Next(x) | Negation(x): return subexprs(x) | {f}
-        case Disjunction(l, r) | Until(l, r) | Implies(l, r) | Conjunction(l, r): return subexprs(l) | subexprs(r) | {f}
-        case _: raise ValueError
+        case AbstractTop() | AbstractBottom() | Variable(_):
+            return {f}
+        case Next(x) | Negation(x):
+            return subexprs(x) | {f}
+        case Disjunction(l, r) | Until(l, r) | Implies(l, r) | Conjunction(l, r):
+            return subexprs(l) | subexprs(r) | {f}
+        case _:
+            raise ValueError
+
+
+def formula_depth(f: Formula) -> int:
+    match f:
+        case AbstractTop() | AbstractBottom() | Variable(_):
+            return 0
+        case Next(f) | Negation(f):
+            return 1 + formula_depth(f)
+        case Disjunction(l, r) | Conjunction(l, r) | Implies(l, r) | Until(l, r):
+            return 1 + max(map(formula_depth, (l, r)))
+        case _:
+            raise ValueError
