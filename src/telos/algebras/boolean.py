@@ -26,7 +26,7 @@ class Boolean(Algebra):
         return torch.logical_not(x)
 
     def running_meet(self, x: Tensor) -> Tensor:
-        return torch.cumprod(x, dim=-1)
+        return torch.cumprod(x, dim=-1).bool()
 
     def running_join(self, x: Tensor) -> Tensor:
         return torch.cummax(x, dim=-1).values
