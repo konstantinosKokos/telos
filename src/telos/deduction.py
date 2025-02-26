@@ -87,7 +87,7 @@ def model(algebra: Algebra, cache_size: int = 128) -> Model:
                 return algebra.implies(go(trace >> l), go(trace >> r))
             case Until(l, r):
                 lss = algebra.span_meet(go(trace >> l))
-                rs = go(trace >> r)[..., None]
+                rs = go(trace >> r)[..., None, :]
                 return algebra.exists(algebra.meet(lss, rs))
             case _:
                 raise ValueError
