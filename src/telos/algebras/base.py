@@ -7,7 +7,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Callable as Fn
 from itertools import accumulate
-from functools import reduce, lru_cache
+from functools import reduce
 
 
 def scan(fn: Fn[[Tensor, Tensor], Tensor]) -> Fn[[Tensor], Tensor]:
@@ -29,7 +29,7 @@ def span(
 ) -> Fn[[Tensor], Tensor]:
     def f(x: Tensor) -> Tensor:
         n = x.size(-1)
-        mask = torch.triu(torch.ones(n, n, dtype=x.dtype, device=x.device)).bool()
+        mask = torch.triu(torch.ones(n, n, device=x.device)).bool()
         return torch.where(mask, fn(torch.where(mask, x[..., None, :], neutral)), bottom)
     return f
 
