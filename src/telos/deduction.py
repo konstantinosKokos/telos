@@ -62,8 +62,7 @@ class Model(Protocol):
 
 def model(algebra: Algebra, cache_size: int = 128) -> Model:
     @lru_cache(maxsize=cache_size)
-    def go(j: Judgement) -> Tensor:
-        trace, conclusion = j.trace, j.conclusion
+    def go(trace: Trace, conclusion: Formula) -> Tensor:
 
         def reshape(result: Tensor) -> Tensor:
             return result.expand_as(next(iter(trace.values())))
@@ -76,24 +75,24 @@ def model(algebra: Algebra, cache_size: int = 128) -> Model:
             case Variable(x):
                 return trace[Variable(x)]
             case Negation(x):
-                return algebra.neg(go(trace >> x))
+                return algebra.neg(go(trace, x))
             case Next(x):
-                return pad(go(trace >> x)[..., 1:], pad=(0, 1), value=algebra.bottom)
+                return pad(go(trace, x)[..., 1:], pad=(0, 1), value=algebra.bottom)
             case Disjunction(l, r):
-                return algebra.join(go(trace >> l), go(trace >> r))
+                return algebra.join(go(trace, l), go(trace, r))
             case Conjunction(l, r):
-                return algebra.meet(go(trace >> l), go(trace >> r))
+                return algebra.meet(go(trace, l), go(trace, r))
             case Implies(l, r):
-                return algebra.implies(go(trace >> l), go(trace >> r))
+                return algebra.implies(go(trace, l), go(trace, r))
             case Until(l, r):
-                lss = algebra.span_meet(go(trace >> l))
-                rs = go(trace >> r)[..., None, :]
+                lss = algebra.span_meet(go(trace, l))
+                rs = go(trace, r)[..., None, :]
                 return algebra.exists(algebra.meet(lss, rs))
             case _:
                 raise ValueError
 
     def evaluate(judgement: Judgement, return_trajectory: bool = False) -> Tensor:
-        result = go(judgement)
+        result = go(judgement.trace, judgement.conclusion)
         return result if return_trajectory else result[..., 0]
 
     return evaluate
