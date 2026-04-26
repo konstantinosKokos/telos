@@ -11,8 +11,6 @@ from torch import Tensor
 from typing import Any, Protocol
 from torch.nn.functional import pad
 
-from functools import lru_cache
-
 
 class Trace(dict[Variable, Tensor]):
     def __init__(self, mapping: dict[Variable, Tensor]):
@@ -36,9 +34,6 @@ class Trace(dict[Variable, Tensor]):
              all(torch.all(self[k] == other[k]) for k in self.variables))
         )
 
-    def __hash__(self) -> int:
-        return hash(tuple(sorted(self.items())))
-
 
 class Judgement:
     def __init__(self, trace: Trace, conclusion: Formula):
@@ -52,16 +47,12 @@ class Judgement:
     def __eq__(self, other: Any):
         return isinstance(other, Judgement) and all((self.trace == other.trace, self.conclusion == other.conclusion))
 
-    def __hash__(self) -> int:
-        return hash(map(hash, (self.trace, self.conclusion)))
-
 
 class Model(Protocol):
     def __call__(self, judgement: Judgement, return_trajectory: bool = False) -> Tensor: ...
 
 
-def model(algebra: Algebra, cache_size: int = 128) -> Model:
-    @lru_cache(maxsize=cache_size)
+def model(algebra: Algebra) -> Model:
     def go(trace: Trace, conclusion: Formula) -> Tensor:
 
         def reshape(result: Tensor) -> Tensor:

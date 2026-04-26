@@ -1,7 +1,7 @@
 import torch
 from torch import Tensor
 
-from .base import Algebra, Properties
+from .base import Algebra
 
 
 class Boolean(Algebra):
@@ -11,7 +11,6 @@ class Boolean(Algebra):
         super().__init__()
         self.register_buffer('_top', torch.tensor(True))
         self.register_buffer('_bottom', torch.tensor(False))
-        self.properties = Properties.check(self)
 
     def meet(self, x: Tensor, y: Tensor) -> Tensor:
         return torch.bitwise_and(x, y)

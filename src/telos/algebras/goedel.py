@@ -1,14 +1,10 @@
 import torch
 from torch import Tensor
 
-from .base import FuzzyBase, Properties
+from .base import FuzzyBase
 
 
 class Goedel(FuzzyBase):
-    def __init__(self):
-        super().__init__()
-        self.properties = Properties.check(self)
-
     def meet(self, x: Tensor, y: Tensor) -> Tensor:
         return torch.minimum(x, y)
 
@@ -16,7 +12,7 @@ class Goedel(FuzzyBase):
         return torch.maximum(x, y)
 
     def implies(self, x: Tensor, y: Tensor) -> Tensor:
-        return torch.where(torch.le(x, y), torch.tensor(1.0), y)
+        return torch.where(torch.le(x, y), self.top, y)
 
     def running_meet(self, x: Tensor) -> Tensor:
         return torch.cummin(x, dim=-1).values

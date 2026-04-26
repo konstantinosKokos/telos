@@ -1,14 +1,10 @@
 import torch
 from torch import Tensor
 
-from .base import FuzzyBase, Properties
+from .base import FuzzyBase
 
 
 class Product(FuzzyBase):
-    def __init__(self):
-        super().__init__()
-        self.properties = Properties.check(self)
-
     def meet(self, x: Tensor, y: Tensor) -> Tensor:
         return x * y
 
