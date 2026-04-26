@@ -1,5 +1,6 @@
 from __future__ import annotations
 from abc import ABC
+from typing import NoReturn
 
 
 class Formula(ABC):
@@ -14,6 +15,21 @@ class Formula(ABC):
 
     def __hash__(self) -> int:
         return formula_hash(self)
+
+    def __or__(self, other: Formula) -> Formula:
+        return Disjunction(self, other)
+
+    def __and__(self, other: Formula) -> Formula:
+        return Conjunction(self, other)
+
+    def __gt__(self, other: Formula) -> Formula:
+        return Implies(self, other)
+
+    def __invert__(self) -> Formula:
+        return Negation(self)
+
+    def __bool__(self) -> NoReturn:
+        raise TypeError
 
 
 class AbstractTop(Formula):
