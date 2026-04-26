@@ -132,7 +132,7 @@ def formula_eq(left: Formula, right: Formula) -> bool:
             return True
         case Variable(x), Variable(y):
             return x == y
-        case Next(x), Next(y):
+        case (Next(x), Next(y)) | (Negation(x), Negation(y)):
             return formula_eq(x, y)
         case (Disjunction(l1, r1), Disjunction(l2, r2)) \
              | (Conjunction(l1, r1), Conjunction(l2, r2)) \
@@ -166,25 +166,3 @@ def formula_hash(f: Formula) -> int:
         case _: raise ValueError
 
 
-def subexprs(f: Formula) -> set[Formula]:
-    match f:
-        case AbstractTop() | AbstractBottom() | Variable(_):
-            return {f}
-        case Next(x) | Negation(x):
-            return subexprs(x) | {f}
-        case Disjunction(l, r) | Until(l, r) | Implies(l, r) | Conjunction(l, r):
-            return subexprs(l) | subexprs(r) | {f}
-        case _:
-            raise ValueError
-
-
-def formula_depth(f: Formula) -> int:
-    match f:
-        case AbstractTop() | AbstractBottom() | Variable(_):
-            return 0
-        case Next(f) | Negation(f):
-            return 1 + formula_depth(f)
-        case Disjunction(l, r) | Conjunction(l, r) | Implies(l, r) | Until(l, r):
-            return 1 + max(map(formula_depth, (l, r)))
-        case _:
-            raise ValueError
