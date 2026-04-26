@@ -3,3 +3,5 @@ from .goedel import Goedel
 from .boolean import Boolean
 from .product import Product
 from .lukasiewicz import Lukasiewicz
+from .robustness import Robustness
+from .frank import Frank
