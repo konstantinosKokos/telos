@@ -44,7 +44,7 @@ class Variable(Formula):
     __match_args__ = ('name',)
 
     def __init__(self, name: str):
-        assert len(name) == 1 and 'a' <= name <= 'z', "Only lowercase latin characters allowed as variable names."
+        assert name.isidentifier(), f"Variable name must be a valid Python identifier; got {name!r}."
         self.name = name
 
 
