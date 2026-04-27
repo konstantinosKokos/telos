@@ -5,12 +5,10 @@ from .base import Algebra
 
 
 class Boolean(Algebra):
-    dtype = bool
-
     def __init__(self):
         super().__init__()
-        self.register_buffer('_top', torch.tensor(True))
-        self.register_buffer('_bottom', torch.tensor(False))
+        self.register_buffer('top', torch.tensor(True))
+        self.register_buffer('bottom', torch.tensor(False))
 
     def meet(self, x: Tensor, y: Tensor) -> Tensor:
         return torch.bitwise_and(x, y)

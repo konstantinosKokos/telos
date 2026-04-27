@@ -22,8 +22,11 @@ class Frank(FuzzyBase):
         return 1 - self.meet(1 - x, 1 - y)
 
     def implies(self, x: Tensor, y: Tensor) -> Tensor:
-        x_s = torch.where(x > 0, x, torch.ones_like(x))
-        r = torch.log1p((self.lam ** y - 1) * (self.lam - 1) / (self.lam ** x_s - 1)) / torch.log(self.lam)
+        log_lam = torch.log(self.lam)
+        u = -torch.expm1(x * log_lam)
+        v = -torch.expm1(y * log_lam)
+        u_s = torch.where(u > 0, u, torch.ones_like(u))
+        r = torch.log1p(-v * (1 - self.lam) / u_s) / log_lam
         return torch.where(x <= y, self.top.expand_as(r), r)
 
     def running_meet(self, x: Tensor) -> Tensor:

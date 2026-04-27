@@ -5,12 +5,10 @@ from .base import Algebra
 
 
 class Robustness(Algebra):
-    dtype = float
-
     def __init__(self):
         super().__init__()
-        self.register_buffer('_top', torch.tensor(float('inf')))
-        self.register_buffer('_bottom', torch.tensor(float('-inf')))
+        self.register_buffer('top', torch.tensor(float('inf')))
+        self.register_buffer('bottom', torch.tensor(float('-inf')))
 
     def meet(self, x: Tensor, y: Tensor) -> Tensor:
         return torch.minimum(x, y)

@@ -34,12 +34,12 @@ def span(
 
 
 class Algebra(ABC, Module):
-    dtype = ...
+    top: Tensor
+    bottom: Tensor
 
     @property
-    def top(self) -> Tensor: return self._top
-    @property
-    def bottom(self) -> Tensor: return self._bottom
+    def dtype(self) -> torch.dtype: return self.top.dtype
+
     @abstractmethod
     def meet(self, x: Tensor, y: Tensor) -> Tensor: ...
     @abstractmethod
@@ -58,12 +58,10 @@ class Algebra(ABC, Module):
 
 
 class FuzzyBase(Algebra, ABC):
-    dtype = float
-
     def __init__(self):
         super().__init__()
-        self.register_buffer('_top', torch.tensor(1.))
-        self.register_buffer('_bottom', torch.tensor(0.))
+        self.register_buffer('top', torch.tensor(1.))
+        self.register_buffer('bottom', torch.tensor(0.))
 
     def neg(self, x: Tensor) -> Tensor:
         return 1 - x
