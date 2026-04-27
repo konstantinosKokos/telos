@@ -17,5 +17,11 @@ class Product(FuzzyBase):
     def running_meet(self, x: Tensor) -> Tensor:
         return torch.cumprod(x, dim=-1)
 
+    def running_join(self, x: Tensor) -> Tensor:
+        return 1 - torch.cumprod(1 - x, dim=-1)
+
     def forall(self, x: Tensor) -> Tensor:
         return torch.prod(x, dim=-1)
+
+    def exists(self, x: Tensor) -> Tensor:
+        return 1 - torch.prod(1 - x, dim=-1)
