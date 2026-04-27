@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "telos"
+version = "0.1.0"
+description = "A framework for evaluating and back-propagating through linear temporal logic traces, in pytorch."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+authors = [
+    { name = "Konstantinos Kogkalidis" }
+]
+dependencies = [
+    "torch>=2.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
