@@ -3,7 +3,10 @@ from __future__ import annotations
 import pytest
 import torch
 
-from telos.algebras import Boolean, Goedel, Lukasiewicz, Product, Robustness, Frank
+from telos.algebras import (
+    Boolean, Goedel, Lukasiewicz, Product, Robustness, Frank,
+    Hamacher, Yager, SchweizerSklar, AczelAlsina, Dombi, SugenoWeber, LSE,
+)
 from telos.algebras.base import scan, fold, span
 
 
@@ -13,7 +16,14 @@ algebras = [
     Lukasiewicz(),
     Product(),
     Robustness(),
-    Frank(lam=0.5, trainable=False),
+    Frank(p=0.5, trainable=False),
+    Hamacher(p=2., trainable=False),
+    Yager(p=2., trainable=False),
+    SchweizerSklar(p=2., trainable=False),
+    AczelAlsina(p=2., trainable=False),
+    Dombi(p=2., trainable=False),
+    SugenoWeber(p=1., trainable=False),
+    LSE(p=2., trainable=False),
 ]
 batch, time = 4, 12
 

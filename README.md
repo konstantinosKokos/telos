@@ -82,14 +82,38 @@ A convenience subclass `FuzzyBase` handles the common case of a `[0,1]` carrier 
 
 #### Existing Implementations
 
-| Algebra       | Carrier    | Notes                                                                               |
-|---------------|------------|-------------------------------------------------------------------------------------|
-| `Boolean`     | `bool`     | exact satisfaction                                                                  |
-| `Goedel`      | `[0,1]`    | min/max t-norm; idempotent                                                          |
-| `Lukasiewicz` | `[0,1]`    | bounded-sum t-norm; nilpotent                                                       |
-| `Product`     | `[0,1]`    | algebraic-product t-norm                                                            |
-| `Robustness`  | `ℝ ∪ {±∞}` | STL signed margin                                                                   |
-| `Frank`       | `[0,1]`    | parametric; `lam` interpolates Goedel / Product / Lukasiewicz; optionally trainable |
+The algebras in the table below are implemented and property tested.
+
+**Legend**:
+* idempotence (Idem)
+* absorption (Abs)
+* distributivity (Dist)
+* complementarity (Comp). 
+
+See `algebras` for the implementations, and `tests/test_properties.py` for the checks.
+
+| Algebra          | Carrier    | Diff  | Train | Idem  | Abs   | Dist  | Comp  |
+|------------------|------------|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+| `Boolean`        | `𝔹`        |       |       |   ✓   |   ✓   |   ✓   |   ✓   |
+| `Goedel`         | `[0, 1]`   | [^a]  |       |   ✓   |   ✓   |   ✓   |       |
+| `Lukasiewicz`    | `[0, 1]`   |   ✓   |       |       |       |       |   ✓   |
+| `Product`        | `[0, 1]`   |   ✓   |       |       |       |       |       |
+| `Robustness`     | `ℝ ∪ {±∞}` |   ✓   |       |   ✓   |   ✓   |   ✓   |       |
+| `Frank`          | `[0, 1]`   |   ✓   |   ✓   | [^c]  | [^c]  | [^c]  | [^b]  |
+| `Hamacher`       | `[0, 1]`   |   ✓   |   ✓   |       |       |       |       |
+| `Yager`          | `[0, 1]`   |   ✓   |   ✓   | [^b]  | [^b]  | [^b]  | [^d]  |
+| `SchweizerSklar` | `[0, 1]`   |   ✓   |   ✓   |       |       |       | [^e]  |
+| `AczelAlsina`    | `[0, 1]`   |   ✓   |   ✓   | [^b]  | [^b]  | [^b]  |       |
+| `Dombi`          | `[0, 1]`   |   ✓   |   ✓   | [^b]  | [^b]  | [^b]  |       |
+| `SugenoWeber`    | `[0, 1]`   |   ✓   |   ✓   |       |       |       | [^c]  |
+| `LSE`            | `ℝ ∪ {±∞}` |   ✓   |   ✓   | [^b]  | [^b]  | [^b]  |       |
+
+[^a]: `Implies` is _not_ differentiable in its first argument.
+[^b]: When `p → ∞`.
+[^c]: When `p → 0`.
+[^d]: When `p = 1`.
+[^e]: When `p ≥ 1`.
+
 
 #### Writing your Own
 

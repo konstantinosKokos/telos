@@ -5,3 +5,10 @@ from .product import Product
 from .lukasiewicz import Lukasiewicz
 from .robustness import Robustness
 from .frank import Frank
+from .hamacher import Hamacher
+from .yager import Yager
+from .schweizer_sklar import SchweizerSklar
+from .aczel_alsina import AczelAlsina
+from .dombi import Dombi
+from .sugeno_weber import SugenoWeber
+from .lse import LSE

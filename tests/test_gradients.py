@@ -4,7 +4,10 @@ import pytest
 import torch
 
 from telos import Variable, Model, mkTrace, eventually, always
-from telos.algebras import Goedel, Lukasiewicz, Product, Robustness, Frank
+from telos.algebras import (
+    Goedel, Lukasiewicz, Product, Robustness, Frank,
+    Hamacher, Yager, SchweizerSklar, AczelAlsina, Dombi, SugenoWeber, LSE,
+)
 
 
 algebras = [
@@ -12,7 +15,14 @@ algebras = [
     Lukasiewicz(),
     Product(),
     Robustness(),
-    Frank(lam=0.5, trainable=False),
+    Frank(p=0.5, trainable=False),
+    Hamacher(p=2., trainable=False),
+    Yager(p=2., trainable=False),
+    SchweizerSklar(p=2., trainable=False),
+    AczelAlsina(p=2., trainable=False),
+    Dombi(p=2., trainable=False),
+    SugenoWeber(p=1., trainable=False),
+    LSE(p=2., trainable=False),
 ]
 time = 8
 
@@ -61,19 +71,34 @@ def test_evaluator_trajectory():
     assert torch.equal(trajectory[..., 0], scalar)
 
 
-def test_frank_lam_trainable():
-    A = Frank(lam=0.5, trainable=True)
+parametric = [
+    (Frank, dict(p=0.5)),
+    (Hamacher, dict(p=2.)),
+    (Yager, dict(p=2.)),
+    (SchweizerSklar, dict(p=2.)),
+    (AczelAlsina, dict(p=2.)),
+    (Dombi, dict(p=2.)),
+    (SugenoWeber, dict(p=1.)),
+    (LSE, dict(p=2.)),
+]
+
+
+@pytest.mark.parametrize('cls, kwargs', parametric, ids=[c.__name__ for c, _ in parametric])
+def test_param_trainable(cls, kwargs):
+    A = cls(**kwargs, trainable=True)
     A.meet(fresh(time), fresh(time)).sum().backward()
-    assert A._lam.grad is not None
+    assert all(p.grad is not None for p in A.parameters())
 
 
-def test_frank_lam_frozen():
-    A = Frank(lam=0.5, trainable=False)
+@pytest.mark.parametrize('cls, kwargs', parametric, ids=[c.__name__ for c, _ in parametric])
+def test_param_frozen(cls, kwargs):
+    A = cls(**kwargs, trainable=False)
     A.meet(fresh(time), fresh(time)).sum().backward()
-    assert A._lam.grad is None
+    assert all(p.grad is None for p in A.parameters())
 
 
-def test_frank_lam_through_model():
-    A = Frank(lam=0.5, trainable=True)
+@pytest.mark.parametrize('cls, kwargs', parametric, ids=[c.__name__ for c, _ in parametric])
+def test_param_through_model(cls, kwargs):
+    A = cls(**kwargs, trainable=True)
     Model(A)(mkTrace(p=fresh(time), q=fresh(time)) >> phi).backward()
-    assert A._lam.grad is not None
+    assert all(p.grad is not None for p in A.parameters())
