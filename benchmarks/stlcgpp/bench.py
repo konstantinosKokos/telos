@@ -1,25 +1,23 @@
-"""telos vs STLCG++ (stlcgpp: PyTorch, stljax: JAX). Data layer for benchmark.ipynb.
+"""telos vs STLCG++ (the PyTorch package, `stlcgpp`). Data layer for benchmark.ipynb.
 
-parity(backend)        max |telos - STLCG++| over full robustness trajectories
-grid()                 (T, batch) timing grid, telos vs stlcgpp, exact + lse
-sweep(backend)         dense T scaling at batch 1: wall time, peak memory
-plot(rows, ...)        the three-panel scaling figure
-cached(name, fn)       json-backed memoization under results/
+parity()          max |telos - STLCG++| over full robustness trajectories,
+                  on randomly generated formulas and traces
+grid()            (T, batch) timing grid, exact + lse semantics
+sweep()           dense T scaling at batch 1: wall time, peak memory,
+                  all four implementations
+plot(rows, ...)   the 2x2 scaling figure
+cached(name, fn)  json-backed memoization under results/
 
-JAX sweep cells run in subprocesses: jax's peak-memory counter is monotone
-per process and an OOM can poison the runtime. Compile time is recorded but
-excluded from timings; the cutoff applies to steady-state runtime.
+Sweep cells run in fresh subprocesses: peak-memory readings stay free of
+cross-cell residue and an OOM cannot poison the run.
 """
 from __future__ import annotations
 
 import json
-import os
 import subprocess
 import sys
 import time
 from pathlib import Path
-
-os.environ.setdefault('XLA_PYTHON_CLIENT_PREALLOCATE', 'false')
 
 import torch
 from telos import LSE, Model, Robustness, Trace, Until, Variable, always, eventually
@@ -27,7 +25,7 @@ from telos import LSE, Model, Robustness, Trace, Until, Variable, always, eventu
 HERE = Path(__file__).parent
 TS = (64, 96, 128, 192, 256, 384, 512, 768, 1024, 1536, 2048, 3072, 4096)
 GRID = ((64, 1), (64, 64), (256, 1), (256, 64), (1024, 1), (1024, 16), (4096, 1))
-CUTOFF_S, REPS, WARMUP = 30., 10, 3
+CUTOFF_S, REPS, WARMUP = 600., 10, 3
 
 P, Q = Variable('p'), Variable('q')
 FORMULAS = {
@@ -42,9 +40,8 @@ FORMULAS = {
 SWEEP_FORMULAS = ('□(p → ◇q)', 'p U q')
 
 
-def _stl(backend: str, name: str, recurrent: bool = False):
-    F = __import__('stljax.formula' if backend == 'jax' else 'stlcgpp.formula',
-                   fromlist=['formula'])
+def _stl(name: str, recurrent: bool = False):
+    import stlcgpp.formula as F
     sp = F.GreaterThan(F.Predicate('p', lambda s: s[..., 0]), 0.0)
     sq = F.GreaterThan(F.Predicate('q', lambda s: s[..., 1]), 0.0)
     ev, alw, until = ((F.EventuallyRecurrent, F.AlwaysRecurrent, F.UntilRecurrent)
@@ -65,12 +62,8 @@ def _values(T: int, batch: int = 1) -> torch.Tensor:
     return torch.randn(batch, 2, T, generator=g)
 
 
-def _signal(backend: str, values: torch.Tensor):
-    arr = values.transpose(-2, -1).contiguous()
-    if backend == 'jax':
-        import jax
-        return jax.device_put(arr.numpy())
-    return arr
+def _signal(values: torch.Tensor) -> torch.Tensor:
+    return values.transpose(-2, -1).contiguous()
 
 
 def _median_ms(fn, sync, reps: int = REPS, warmup: int = WARMUP) -> float:
@@ -103,11 +96,10 @@ def random_formula(depth: int, rng):
             'until': lambda: Until(deep(), sub())}[op]()
 
 
-def translate(formula, backend: str):
+def translate(formula):
     """telos Formula to the equivalent STLCG++ formula."""
+    import stlcgpp.formula as F
     from telos.syntax import AbstractTop, Conjunction, Disjunction, Implies, Negation
-    F = __import__('stljax.formula' if backend == 'jax' else 'stlcgpp.formula',
-                   fromlist=['formula'])
     atom = {v: F.GreaterThan(F.Predicate(v, lambda s, i=i: s[..., i]), 0.0)
             for i, v in enumerate(('p', 'q'))}
     def go(phi):
@@ -123,22 +115,20 @@ def translate(formula, backend: str):
     return go(formula)
 
 
-def parity(backend: str, n: int = 20, depths: tuple = (2, 4, 6), T: int = 37,
-           seed: int = 0) -> list[dict]:
+def parity(n: int = 20, depths: tuple = (2, 4, 6), T: int = 37, seed: int = 0) -> list[dict]:
     import numpy as np
     rng = np.random.default_rng(seed)
     rows = []
     for depth in depths:
         for _ in range(n):
             formula = random_formula(depth, rng)
-            theirs = translate(formula, backend)
+            theirs = translate(formula)
             values = torch.from_numpy(rng.standard_normal((2, T)).astype(np.float32))
             trace = Trace(values, ('p', 'q'))
-            signal = _signal(backend, values[None])[0]
+            signal = _signal(values[None])[0]
             def delta(algebra, **kw):
                 ours = Model(algebra)(trace >> formula, return_trajectory=True)
-                ref = torch.asarray(theirs(signal, **kw).__array__(), copy=True)
-                return float((ours - ref).abs().max())
+                return float((ours - theirs(signal, **kw)).abs().max())
             rows.append({'depth': depth, 'formula': repr(formula),
                          'exact': delta(Robustness(), approx_method='true'),
                          'lse': delta(LSE(p=1., trainable=False),
@@ -146,19 +136,19 @@ def parity(backend: str, n: int = 20, depths: tuple = (2, 4, 6), T: int = 37,
     return rows
 
 
-# ---------- grid (telos vs stlcgpp, exact + lse, fwd and fwd+bwd) ----------
+# ---------- grid (exact + lse, fwd and fwd+bwd) ----------
 
 def grid(device: str = 'cuda') -> list[dict]:
     rows = []
     for T, B in GRID:
         values = _values(T, B).to(device)
-        signal = _signal('torch', values.cpu()).to(device)
+        signal = _signal(values.cpu()).to(device)
         for formula in ('◇p', '□(p → ◇q)', 'p U q', '(p∨q) U (p∧q)'):
             for mode, algebra, kw in (
                     ('exact', Robustness(), {'approx_method': 'true'}),
                     ('lse', LSE(p=1., trainable=False), {'approx_method': 'logsumexp', 'temperature': 1.0})):
                 model = Model(algebra).to(device)
-                sf = _stl('torch', formula)
+                sf = _stl(formula)
                 one = lambda s: sf(s, **kw)
                 s_fn = torch.vmap(one) if B > 1 else lambda s: one(s[0])[None]
                 for backward in (False, True):
@@ -187,79 +177,75 @@ def grid(device: str = 'cuda') -> list[dict]:
 
 # ---------- sweep (dense T, batch 1, exact, fwd+bwd, time + peak memory) ----------
 
-def _cell(backend: str, T: int, formula: str, impl: str) -> dict:
+class FallbackRobustness(Robustness):
+    """Robustness without its vectorized closed forms: sequence reductions
+    revert to the generic scan/fold derivations from the four primitives.
+    This is the path any algebra without closed forms takes (e.g. soft,
+    non-associative meets), benchmarked as `fallback`."""
+    from telos.algebras.base import Algebra as _A
+    running_meet, running_join = _A.running_meet, _A.running_join
+    exists, forall = _A.exists, _A.forall
+    span_meet, span_join = _A.span_meet, _A.span_join
+
+
+def _cell(T: int, formula: str, impl: str) -> dict:
     row = {'T': T, 'formula': formula, 'impl': impl,
            'ms': None, 'peak_gb': None, 'compile_s': None, 'status': 'ok'}
-    if impl == 'telos':
-        model = Model(Robustness()).cuda()
+    if impl in ('telos', 'fallback'):
+        model = Model(Robustness() if impl == 'telos' else FallbackRobustness()).cuda()
         values = _values(T).cuda()
         def fn():
             x = values.detach().requires_grad_(True)
             model(Trace(x, ('p', 'q')) >> FORMULAS[formula]).sum().backward()
-        sync, oom = torch.cuda.synchronize, (torch.cuda.OutOfMemoryError,)
-        peak = lambda: torch.cuda.max_memory_allocated() / 1e9
-        torch.cuda.reset_peak_memory_stats()
     else:
-        import jax
-        sf = _stl(backend, formula, recurrent=impl == 'recurrent')
-        signal = _signal(backend, _values(T)) if backend == 'jax' else _signal('torch', _values(T)).cuda()
-        if backend == 'jax':
-            vg = jax.jit(jax.value_and_grad(lambda s: sf(s[0], approx_method='true')[0]))
-            def fn():
-                vg(signal)[1].block_until_ready()
-            sync, oom = (lambda: None), (jax.errors.JaxRuntimeError, RuntimeError)
-            peak = lambda: (jax.local_devices()[0].memory_stats() or {}).get('peak_bytes_in_use', 0) / 1e9
-        else:
-            def fn():
-                x = signal.detach().requires_grad_(True)
-                sf(x[0], approx_method='true')[0].backward()
-            sync, oom = torch.cuda.synchronize, (torch.cuda.OutOfMemoryError,)
-            peak = lambda: torch.cuda.max_memory_allocated() / 1e9
-            torch.cuda.reset_peak_memory_stats()
+        sf = _stl(formula, recurrent=impl == 'recurrent')
+        signal = _signal(_values(T)).cuda()
+        def fn():
+            x = signal.detach().requires_grad_(True)
+            sf(x[0], approx_method='true')[0].backward()
+    torch.cuda.reset_peak_memory_stats()
     try:
         t0 = time.perf_counter()
         fn()
-        sync()
+        torch.cuda.synchronize()
         row['compile_s'] = time.perf_counter() - t0
         t0 = time.perf_counter()
         fn()
-        sync()
+        torch.cuda.synchronize()
         warm = time.perf_counter() - t0
         if warm > CUTOFF_S:
             row.update(ms=warm * 1e3, status='cutoff')
         else:
-            reps, warmup = (REPS, WARMUP) if warm < 1. else (3, 1)
-            row.update(ms=_median_ms(fn, sync, reps, warmup), peak_gb=peak())
-    except oom as e:
-        if isinstance(e, torch.cuda.OutOfMemoryError) or 'RESOURCE_EXHAUSTED' in str(e):
-            row['status'] = 'oom'
-        else:
-            raise
+            reps, warmup = (REPS, WARMUP) if warm < 1. else (3, 1) if warm < 10. else (1, 0)
+            row.update(ms=_median_ms(fn, torch.cuda.synchronize, reps, warmup),
+                       peak_gb=torch.cuda.max_memory_allocated() / 1e9)
+    except torch.cuda.OutOfMemoryError:
+        row['status'] = 'oom'
     return row
 
 
-def sweep(backend: str) -> list[dict]:
+def sweep(checkpoint: str | None = None) -> list[dict]:
+    """checkpoint: path to dump rows after every cell (crash resilience, live preview)."""
     rows, dead = [], set()
     for T in TS:
         for formula in SWEEP_FORMULAS:
-            for impl in ('telos', 'masked', 'recurrent'):
+            for impl in ('telos', 'fallback', 'masked', 'recurrent'):
                 if (formula, impl) in dead:
                     continue
-                if backend == 'jax' and impl != 'telos':
-                    proc = subprocess.run(
-                        [sys.executable, __file__, backend, str(T), formula, impl],
-                        capture_output=True, text=True, timeout=600)
-                    out = proc.stdout.strip().splitlines()
-                    row = (json.loads(out[-1]) if out else
-                           {'T': T, 'formula': formula, 'impl': impl, 'ms': None,
-                            'peak_gb': None, 'compile_s': None,
-                            'status': 'oom' if 'RESOURCE_EXHAUSTED' in proc.stderr else 'error'})
-                else:
-                    row = _cell(backend, T, formula, impl)
-                    torch.cuda.empty_cache()
+                # fresh subprocess per cell: keeps peak-memory readings free of
+                # cross-cell residue and isolates OOMs
+                proc = subprocess.run(
+                    [sys.executable, __file__, str(T), formula, impl],
+                    capture_output=True, text=True, timeout=3600)
+                out = proc.stdout.strip().splitlines()
+                row = (json.loads(out[-1]) if out else
+                       {'T': T, 'formula': formula, 'impl': impl, 'ms': None,
+                        'peak_gb': None, 'compile_s': None, 'status': 'error'})
                 if row['status'] != 'ok':
                     dead.add((formula, impl))
                 rows.append(row)
+                if checkpoint:
+                    Path(checkpoint).write_text(json.dumps(rows, indent=1))
     return rows
 
 
@@ -289,10 +275,21 @@ def speedups(rows: list[dict]) -> dict:
     return out
 
 
+STYLE = {  # impl -> (color, linestyle); hue = tool, shade = variant (dark: fast path)
+    'telos':     ('#1c5cab', 'solid'),
+    'fallback':  ('#6da7ec', 'solid'),
+    'masked':    ('#0d8c5c', 'solid'),
+    'recurrent': ('#52c69a', 'solid'),
+}
+LEGEND = {'telos': 'telos (algebra-native)', 'fallback': 'telos (algebra-agnostic fallback)',
+          'masked': 'STLCG++ (masked)', 'recurrent': 'STLCG++ (recurrent)'}
+CRITICAL = '#d03b3b'  # OOM marker
+
+
 def plot(rows: list[dict], title: str, total_gb: float | None = None):
+    import math
     import matplotlib.pyplot as plt
     ink, ink2, muted, grid_c = '#0b0b0b', '#52514e', '#898781', '#e1e0d9'
-    colors = {'telos': '#2a78d6', 'masked': '#1baf7a', 'recurrent': '#eda100'}
 
     def pts(formula, impl, key):
         sel = [(r['T'], r[key]) for r in rows
@@ -305,31 +302,35 @@ def plot(rows: list[dict], title: str, total_gb: float | None = None):
                if r['formula'] == formula and r['impl'] == impl and r['status'] != 'ok']
         return min(sel) if sel else None
 
-    fig, axes = plt.subplots(1, 3, figsize=(12.6, 3.7), facecolor='white')
-    panels = (('□(p → ◇q)', 'ms'), ('p U q', 'ms'), ('p U q', 'peak_gb'))
-    for ax, (formula, key) in zip(axes, panels):
-        for impl in ('recurrent', 'masked', 'telos'):
+    present = [i for i in STYLE if any(r['impl'] == i for r in rows)]
+    fig, axes = plt.subplots(2, 2, figsize=(9.4, 6.8), facecolor='white')
+    formulas, metrics = ('□(p → ◇q)', 'p U q'), ('ms', 'peak_gb')
+    for (i, formula), (j, key) in ((f, m) for f in enumerate(formulas) for m in enumerate(metrics)):
+        ax = axes[i][j]
+        for impl in reversed(present):
+            color, ls = STYLE[impl]
             ts, ys = pts(formula, impl, key)
             if ts:
-                ax.plot(ts, ys, color=colors[impl], lw=2, marker='o', ms=4.5)
-                ax.annotate(impl, xy=(ts[-1], ys[-1]), xytext=(6, 0),
-                            textcoords='offset points', color=colors[impl],
-                            fontsize=9.5, fontweight='bold',
-                            va='bottom' if impl != 'telos' else 'center')
-            if (s := stop(formula, impl)) and key == 'ms':
-                ax.axvline(s[0], color=colors[impl], lw=1, ls=(0, (2, 3)))
-                if ts:
-                    ax.annotate(f'{s[1].upper()}\nat T={s[0]}', xy=(ts[-1], ys[-1]),
-                                ha='left', va='top', xytext=(8, -8),
-                                textcoords='offset points', color=colors[impl], fontsize=8.5)
-        if key == 'peak_gb' and total_gb:
-            ax.axhline(total_gb, color=muted, lw=1, ls=(0, (4, 3)))
-            ax.annotate(f'GPU capacity ({total_gb:.0f} GB)', xy=(64, total_gb),
-                        xytext=(0, 5), textcoords='offset points', color=ink2, fontsize=8.5)
+                ax.plot(ts, ys, color=color, lw=2, ls=ls, marker='o', ms=4)
+            s = stop(formula, impl)
+            if s and ts and s[1] != 'oom' and key == 'ms':
+                ax.annotate(f'{s[1].upper()}\nat T={s[0]}', xy=(ts[-1], ys[-1]),
+                            ha='left', va='top', xytext=(8, -8),
+                            textcoords='offset points', color=color, fontsize=8.5)
+            if s and len(ts) > 1 and s[1] == 'oom':
+                # dashed continuation of the established log-log slope; red x at the OOM point
+                lt, ly = [[math.log(v) for v in vs[-4:]] for vs in (ts, ys)]
+                mt, my = sum(lt) / len(lt), sum(ly) / len(ly)
+                slope = (sum((a - mt) * (b - my) for a, b in zip(lt, ly))
+                         / sum((a - mt) ** 2 for a in lt))
+                y_est = ys[-1] * (s[0] / ts[-1]) ** slope
+                ax.plot([ts[-1], s[0]], [ys[-1], y_est], color=color, lw=1.5, ls=(0, (2, 3)))
+                ax.plot([s[0]], [y_est], marker='x', ms=9, mew=2.5, color=CRITICAL)
         ax.set(xscale='log', yscale='log')
         ax.set_title(f'{formula}: ' + ('wall time' if key == 'ms' else 'peak memory'),
                      color=ink, fontsize=10.5, pad=10)
-        ax.set_xlabel('trace length T', color=ink2, fontsize=9.5)
+        if i == 1:
+            ax.set_xlabel('trace length T', color=ink2, fontsize=9.5)
         ax.set_xticks([64, 256, 1024, 4096], ['64', '256', '1024', '4096'])
         ax.minorticks_off()
         ax.grid(True, which='major', color=grid_c, lw=0.75)
@@ -339,13 +340,24 @@ def plot(rows: list[dict], title: str, total_gb: float | None = None):
         for side in ('left', 'bottom'):
             ax.spines[side].set_color(grid_c)
         ax.margins(x=0.15)
-    axes[0].set_ylabel('forward+backward, ms', color=ink2, fontsize=9.5)
-    axes[2].set_ylabel('peak allocated, GB', color=ink2, fontsize=9.5)
-    fig.suptitle(title, color=ink, fontsize=11, x=0.02, ha='left', y=1.02)
-    fig.tight_layout()
+        if j == 0:
+            ax.set_ylabel('forward+backward, ms', color=ink2, fontsize=9.5)
+        else:
+            ax.set_ylabel('peak allocated, GB', color=ink2, fontsize=9.5)
+    handles = [plt.Line2D([], [], color=STYLE[i][0], ls=STYLE[i][1], lw=2,
+                          marker='o', ms=4, label=LEGEND[i]) for i in present]
+    handles.append(plt.Line2D([], [], color=CRITICAL, ls='none',
+                              marker='x', ms=8, mew=2.5, label='OOM'))
+    leg = fig.legend(handles=handles, loc='upper left', ncol=len(handles), frameon=False,
+                     fontsize=9, bbox_to_anchor=(0.01, 0.985), handlelength=2.6,
+                     columnspacing=1.4)
+    for text, h in zip(leg.get_texts(), handles):
+        text.set_color(h.get_color())
+    fig.suptitle(title, color=ink, fontsize=11, x=0.02, ha='left', y=1.005)
+    fig.tight_layout(rect=(0, 0, 1, 0.955))
     return fig
 
 
-if __name__ == '__main__':  # subprocess cell entry: bench.py <backend> <T> <formula> <impl>
-    backend, T, formula, impl = sys.argv[1:5]
-    print(json.dumps(_cell(backend, int(T), formula, impl)))
+if __name__ == '__main__':  # subprocess cell entry: bench.py <T> <formula> <impl>
+    T, formula, impl = sys.argv[1:4]
+    print(json.dumps(_cell(int(T), formula, impl)))
