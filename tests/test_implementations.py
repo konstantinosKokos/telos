@@ -6,6 +6,7 @@ import torch
 from telos.algebras import (
     Boolean, Goedel, Lukasiewicz, Product, Robustness, Frank,
     Hamacher, Yager, SchweizerSklar, AczelAlsina, Dombi, SugenoWeber, LSE,
+    KleeneDienes,
 )
 from telos.algebras.base import scan, fold, span
 
@@ -24,6 +25,7 @@ algebras = [
     Dombi(p=2., trainable=False),
     SugenoWeber(p=1., trainable=False),
     LSE(p=2., trainable=False),
+    KleeneDienes(),
 ]
 batch, time = 4, 12
 

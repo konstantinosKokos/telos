@@ -31,8 +31,10 @@ class SugenoWeber(FuzzyBase):
     def running_meet(self, x: Tensor) -> Tensor:
         p = self.p
         idx = torch.arange(x.size(-1), dtype=x.dtype, device=x.device)
-        cum = torch.cumprod(1 + p * x, dim=-1)
-        return torch.clamp(cum / (1 + p) ** idx - 1, min=0.) / p
+        log_terms = torch.log1p(p * x)
+        log_cum = torch.cumsum(log_terms, dim=-1)
+        log_denom = idx * torch.log1p(p)
+        return torch.clamp(torch.expm1(log_cum - log_denom), min=0.) / p
 
     def running_join(self, x: Tensor) -> Tensor:
         return 1 - self.running_meet(1 - x)
@@ -40,8 +42,10 @@ class SugenoWeber(FuzzyBase):
     def forall(self, x: Tensor) -> Tensor:
         p = self.p
         n = x.size(-1)
-        prod = torch.prod(1 + p * x, dim=-1)
-        return torch.clamp(prod / (1 + p) ** (n - 1) - 1, min=0.) / p
+        log_terms = torch.log1p(p * x)
+        log_prod = log_terms.sum(dim=-1)
+        log_denom = (n - 1) * torch.log1p(p)
+        return torch.clamp(torch.expm1(log_prod - log_denom), min=0.) / p
 
     def exists(self, x: Tensor) -> Tensor:
         return 1 - self.forall(1 - x)

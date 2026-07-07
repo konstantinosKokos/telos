@@ -7,6 +7,7 @@ from telos import Variable, Model, mkTrace, eventually, always
 from telos.algebras import (
     Goedel, Lukasiewicz, Product, Robustness, Frank,
     Hamacher, Yager, SchweizerSklar, AczelAlsina, Dombi, SugenoWeber, LSE,
+    KleeneDienes,
 )
 
 
@@ -23,6 +24,7 @@ algebras = [
     Dombi(p=2., trainable=False),
     SugenoWeber(p=1., trainable=False),
     LSE(p=2., trainable=False),
+    KleeneDienes(),
 ]
 time = 8
 

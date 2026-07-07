@@ -12,3 +12,4 @@ from .aczel_alsina import AczelAlsina
 from .dombi import Dombi
 from .sugeno_weber import SugenoWeber
 from .lse import LSE
+from .kleene_dienes import KleeneDienes

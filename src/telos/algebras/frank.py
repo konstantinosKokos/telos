@@ -6,14 +6,19 @@ from .base import FuzzyBase
 
 
 class Frank(FuzzyBase):
-    def __init__(self, p: float, trainable: bool, eps: float = 1e-3):
+    def __init__(self, p: float, trainable: bool, upper: bool = False, eps: float = 1e-3):
         super().__init__()
         self._p = Parameter(torch.tensor(p), requires_grad=trainable)
         self.eps = eps
+        self.upper = upper
 
     @property
     def p(self) -> Tensor:
-        return torch.clamp(self._p, min=self.eps)
+        return torch.clamp(
+            self._p,
+            min=1 + self.eps if self.upper else self.eps,
+            max=None if self.upper else 1 - self.eps
+        )
 
     def meet(self, x: Tensor, y: Tensor) -> Tensor:
         return torch.log1p((self.p ** x - 1) * (self.p ** y - 1) / (self.p - 1)) / torch.log(self.p)

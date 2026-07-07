@@ -6,4 +6,5 @@ from .deduction import Trace, Judgement, Model, mkTrace
 from .algebras import (
     Algebra, Boolean, Goedel, Product, Lukasiewicz, Robustness, Frank,
     Hamacher, Yager, SchweizerSklar, AczelAlsina, Dombi, SugenoWeber, LSE,
+    KleeneDienes,
 )

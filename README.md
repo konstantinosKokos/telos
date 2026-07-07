@@ -96,6 +96,7 @@ See `algebras` for the implementations, and `tests/test_properties.py` for the c
 |------------------|------------|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | `Boolean`        | `𝔹`        |       |       |   ✓   |   ✓   |   ✓   |   ✓   |
 | `Goedel`         | `[0, 1]`   | [^a]  |       |   ✓   |   ✓   |   ✓   |       |
+| `KleeneDienes`   | `[0, 1]`   |   ✓   |       |   ✓   |   ✓   |   ✓   |       |
 | `Lukasiewicz`    | `[0, 1]`   |   ✓   |       |       |       |       |   ✓   |
 | `Product`        | `[0, 1]`   |   ✓   |       |       |       |       |       |
 | `Robustness`     | `ℝ ∪ {±∞}` |   ✓   |       |   ✓   |   ✓   |   ✓   |       |
