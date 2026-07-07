@@ -82,14 +82,39 @@ A convenience subclass `FuzzyBase` handles the common case of a `[0,1]` carrier 
 
 #### Existing Implementations
 
-| Algebra       | Carrier    | Notes                                                                               |
-|---------------|------------|-------------------------------------------------------------------------------------|
-| `Boolean`     | `bool`     | exact satisfaction                                                                  |
-| `Goedel`      | `[0,1]`    | min/max t-norm; idempotent                                                          |
-| `Lukasiewicz` | `[0,1]`    | bounded-sum t-norm; nilpotent                                                       |
-| `Product`     | `[0,1]`    | algebraic-product t-norm                                                            |
-| `Robustness`  | `ℝ ∪ {±∞}` | STL signed margin                                                                   |
-| `Frank`       | `[0,1]`    | parametric; `lam` interpolates Goedel / Product / Lukasiewicz; optionally trainable |
+The algebras in the table below are implemented and property tested.
+
+**Legend**:
+* idempotence (Idem)
+* absorption (Abs)
+* distributivity (Dist)
+* complementarity (Comp). 
+
+See `algebras` for the implementations, and `tests/test_properties.py` for the checks.
+
+| Algebra          | Carrier    | Diff  | Train | Idem  | Abs   | Dist  | Comp  |
+|------------------|------------|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+| `Boolean`        | `𝔹`        |       |       |   ✓   |   ✓   |   ✓   |   ✓   |
+| `Goedel`         | `[0, 1]`   | [^a]  |       |   ✓   |   ✓   |   ✓   |       |
+| `KleeneDienes`   | `[0, 1]`   |   ✓   |       |   ✓   |   ✓   |   ✓   |       |
+| `Lukasiewicz`    | `[0, 1]`   |   ✓   |       |       |       |       |   ✓   |
+| `Product`        | `[0, 1]`   |   ✓   |       |       |       |       |       |
+| `Robustness`     | `ℝ ∪ {±∞}` |   ✓   |       |   ✓   |   ✓   |   ✓   |       |
+| `Frank`          | `[0, 1]`   |   ✓   |   ✓   | [^c]  | [^c]  | [^c]  | [^b]  |
+| `Hamacher`       | `[0, 1]`   |   ✓   |   ✓   |       |       |       |       |
+| `Yager`          | `[0, 1]`   |   ✓   |   ✓   | [^b]  | [^b]  | [^b]  | [^d]  |
+| `SchweizerSklar` | `[0, 1]`   |   ✓   |   ✓   |       |       |       | [^e]  |
+| `AczelAlsina`    | `[0, 1]`   |   ✓   |   ✓   | [^b]  | [^b]  | [^b]  |       |
+| `Dombi`          | `[0, 1]`   |   ✓   |   ✓   | [^b]  | [^b]  | [^b]  |       |
+| `SugenoWeber`    | `[0, 1]`   |   ✓   |   ✓   |       |       |       | [^c]  |
+| `LSE`            | `ℝ ∪ {±∞}` |   ✓   |   ✓   | [^b]  | [^b]  | [^b]  |       |
+
+[^a]: `Implies` is _not_ differentiable in its first argument.
+[^b]: When `p → ∞`.
+[^c]: When `p → 0`.
+[^d]: When `p = 1`.
+[^e]: When `p ≥ 1`.
+
 
 #### Writing your Own
 
@@ -150,3 +175,16 @@ Same formula, multiple algebras and evaluations across two trace dtypes.
 - Telos evaluates LTL over finite, fixed-duration traces and cannot work with infinite streams.
 - `X(Φ)` is padded with `algebra.bottom` past the last time step, biasing trace-edge readings toward dissatisfaction.
 - Every algebra is associated with its own domain; you're responsible for using the right dtype.
+
+## Benchmarks
+
+### Comparison to STLCG++
+
+With STL robustness as the target algebra, Telos reproduces [STLCG++](https://github.com/UW-CTRL/stlcg-plus-plus)
+valuations exactly, over randomly generated formulas and traces. The two differ in evaluation cost:
+Telos' scan-based temporal operators run in linear (`◇`, `□`) and quadratic time (unbounded `U`), where STLCG++'s
+masking is quadratic and cubic respectively, making it unworkable for longer traces.
+
+![scaling](benchmarks/stlcgpp/scaling.png)
+
+Parity checks and measurements: [`benchmarks/stlcgpp/benchmark.ipynb`](benchmarks/stlcgpp/benchmark.ipynb).

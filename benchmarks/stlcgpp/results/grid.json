@@ -1,0 +1,1010 @@
+[
+ {
+  "T": 64,
+  "B": 1,
+  "formula": "\u25c7p",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.10328300049877726,
+  "stlcgpp_ms": 0.29480299963324796
+ },
+ {
+  "T": 64,
+  "B": 1,
+  "formula": "\u25c7p",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.36970299970562337,
+  "stlcgpp_ms": 0.6724100003339117
+ },
+ {
+  "T": 64,
+  "B": 1,
+  "formula": "\u25c7p",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.15171399991231738,
+  "stlcgpp_ms": 0.3851120000035735
+ },
+ {
+  "T": 64,
+  "B": 1,
+  "formula": "\u25c7p",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.6182289998832857,
+  "stlcgpp_ms": 0.8189849995687837
+ },
+ {
+  "T": 64,
+  "B": 1,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.18101899968314683,
+  "stlcgpp_ms": 0.631603999863728
+ },
+ {
+  "T": 64,
+  "B": 1,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.700511999639275,
+  "stlcgpp_ms": 1.3283589996717637
+ },
+ {
+  "T": 64,
+  "B": 1,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.3047909995075315,
+  "stlcgpp_ms": 0.9212059994752053
+ },
+ {
+  "T": 64,
+  "B": 1,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.1952889999520266,
+  "stlcgpp_ms": 1.7102640003940905
+ },
+ {
+  "T": 64,
+  "B": 1,
+  "formula": "p U q",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.20965300063835457,
+  "stlcgpp_ms": 11.664222999570484
+ },
+ {
+  "T": 64,
+  "B": 1,
+  "formula": "p U q",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.7984459998624516,
+  "stlcgpp_ms": 23.45007399981114
+ },
+ {
+  "T": 64,
+  "B": 1,
+  "formula": "p U q",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.4211689993098844,
+  "stlcgpp_ms": 27.636548000373296
+ },
+ {
+  "T": 64,
+  "B": 1,
+  "formula": "p U q",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.298913999562501,
+  "stlcgpp_ms": 47.929997999744955
+ },
+ {
+  "T": 64,
+  "B": 1,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.26429500030644704,
+  "stlcgpp_ms": 11.737279999579187
+ },
+ {
+  "T": 64,
+  "B": 1,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.1736090000340482,
+  "stlcgpp_ms": 23.56663299997308
+ },
+ {
+  "T": 64,
+  "B": 1,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.6288479999057017,
+  "stlcgpp_ms": 27.75736399962625
+ },
+ {
+  "T": 64,
+  "B": 1,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.8051320002996363,
+  "stlcgpp_ms": 48.789208000016515
+ },
+ {
+  "T": 64,
+  "B": 64,
+  "formula": "\u25c7p",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.10004700015997514,
+  "stlcgpp_ms": 0.43428299977676943
+ },
+ {
+  "T": 64,
+  "B": 64,
+  "formula": "\u25c7p",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.39111300065997057,
+  "stlcgpp_ms": 0.9093140006370959
+ },
+ {
+  "T": 64,
+  "B": 64,
+  "formula": "\u25c7p",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.1339209993602708,
+  "stlcgpp_ms": 0.5140430002938956
+ },
+ {
+  "T": 64,
+  "B": 64,
+  "formula": "\u25c7p",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.6060149999029818,
+  "stlcgpp_ms": 0.9505910002189921
+ },
+ {
+  "T": 64,
+  "B": 64,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.178724999386759,
+  "stlcgpp_ms": 0.9606000003259396
+ },
+ {
+  "T": 64,
+  "B": 64,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.7006020005064784,
+  "stlcgpp_ms": 1.5604830005031545
+ },
+ {
+  "T": 64,
+  "B": 64,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.2917460005846806,
+  "stlcgpp_ms": 1.157518999207241
+ },
+ {
+  "T": 64,
+  "B": 64,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.1552149999261019,
+  "stlcgpp_ms": 2.0739860001413035
+ },
+ {
+  "T": 64,
+  "B": 64,
+  "formula": "p U q",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.2391279995208606,
+  "stlcgpp_ms": 15.601890999278112
+ },
+ {
+  "T": 64,
+  "B": 64,
+  "formula": "p U q",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.8172909992936184,
+  "stlcgpp_ms": 34.28603600059432
+ },
+ {
+  "T": 64,
+  "B": 64,
+  "formula": "p U q",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.6352599993988406,
+  "stlcgpp_ms": 34.262593000676134
+ },
+ {
+  "T": 64,
+  "B": 64,
+  "formula": "p U q",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.3294410000526113,
+  "stlcgpp_ms": 58.256395999706
+ },
+ {
+  "T": 64,
+  "B": 64,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.2839819999280735,
+  "stlcgpp_ms": 15.640784000424901
+ },
+ {
+  "T": 64,
+  "B": 64,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.1983549993601628,
+  "stlcgpp_ms": 31.75512500001787
+ },
+ {
+  "T": 64,
+  "B": 64,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.5822409993925248,
+  "stlcgpp_ms": 34.817703000044276
+ },
+ {
+  "T": 64,
+  "B": 64,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.8505280004319502,
+  "stlcgpp_ms": 59.546813999986625
+ },
+ {
+  "T": 256,
+  "B": 1,
+  "formula": "\u25c7p",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.09857399982138304,
+  "stlcgpp_ms": 0.3068449996135314
+ },
+ {
+  "T": 256,
+  "B": 1,
+  "formula": "\u25c7p",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.3786099996432313,
+  "stlcgpp_ms": 0.6887810004627681
+ },
+ {
+  "T": 256,
+  "B": 1,
+  "formula": "\u25c7p",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.14149500020721462,
+  "stlcgpp_ms": 0.37526400046772324
+ },
+ {
+  "T": 256,
+  "B": 1,
+  "formula": "\u25c7p",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.625442000455223,
+  "stlcgpp_ms": 0.8113899993986706
+ },
+ {
+  "T": 256,
+  "B": 1,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.18705999991652789,
+  "stlcgpp_ms": 0.6362220001392416
+ },
+ {
+  "T": 256,
+  "B": 1,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.6735520000802353,
+  "stlcgpp_ms": 1.2827639993702178
+ },
+ {
+  "T": 256,
+  "B": 1,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.2994209999087616,
+  "stlcgpp_ms": 0.8906889997888356
+ },
+ {
+  "T": 256,
+  "B": 1,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.317137999649276,
+  "stlcgpp_ms": 1.7618210004002322
+ },
+ {
+  "T": 256,
+  "B": 1,
+  "formula": "p U q",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.21320900032151258,
+  "stlcgpp_ms": 45.067066000228806
+ },
+ {
+  "T": 256,
+  "B": 1,
+  "formula": "p U q",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.8520660003341618,
+  "stlcgpp_ms": 93.8804009992964
+ },
+ {
+  "T": 256,
+  "B": 1,
+  "formula": "p U q",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.4172219996689819,
+  "stlcgpp_ms": 111.85811499944975
+ },
+ {
+  "T": 256,
+  "B": 1,
+  "formula": "p U q",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.3587960002041655,
+  "stlcgpp_ms": 190.7966230000966
+ },
+ {
+  "T": 256,
+  "B": 1,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.2675710002222331,
+  "stlcgpp_ms": 46.17958200014982
+ },
+ {
+  "T": 256,
+  "B": 1,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.2146959998062812,
+  "stlcgpp_ms": 94.7168619995864
+ },
+ {
+  "T": 256,
+  "B": 1,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.5786339997939649,
+  "stlcgpp_ms": 110.62060899985227
+ },
+ {
+  "T": 256,
+  "B": 1,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.875624000604148,
+  "stlcgpp_ms": 195.8122470005037
+ },
+ {
+  "T": 256,
+  "B": 64,
+  "formula": "\u25c7p",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.10188100077357376,
+  "stlcgpp_ms": 0.6026890005159657
+ },
+ {
+  "T": 256,
+  "B": 64,
+  "formula": "\u25c7p",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.39346700032183435,
+  "stlcgpp_ms": 1.0120770002686186
+ },
+ {
+  "T": 256,
+  "B": 64,
+  "formula": "\u25c7p",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.13900999965699157,
+  "stlcgpp_ms": 1.204076000249188
+ },
+ {
+  "T": 256,
+  "B": 64,
+  "formula": "\u25c7p",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.6636030002482585,
+  "stlcgpp_ms": 2.2777879994464456
+ },
+ {
+  "T": 256,
+  "B": 64,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.1805080000849557,
+  "stlcgpp_ms": 1.28063000011025
+ },
+ {
+  "T": 256,
+  "B": 64,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.7383530000879546,
+  "stlcgpp_ms": 2.262920000248414
+ },
+ {
+  "T": 256,
+  "B": 64,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.2912460004154127,
+  "stlcgpp_ms": 2.594862000478315
+ },
+ {
+  "T": 256,
+  "B": 64,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.250442000127805,
+  "stlcgpp_ms": 4.724942999928317
+ },
+ {
+  "T": 256,
+  "B": 64,
+  "formula": "p U q",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.5437890004031942,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 256,
+  "B": 64,
+  "formula": "p U q",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.993285000025935,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 256,
+  "B": 64,
+  "formula": "p U q",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 1.3156450004316866,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 256,
+  "B": 64,
+  "formula": "p U q",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 6.72389800001838,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 256,
+  "B": 64,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.5910380004934268,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 256,
+  "B": 64,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 2.148646000023291,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 256,
+  "B": 64,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 1.4236070001061307,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 256,
+  "B": 64,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 5.254104000414372,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 1024,
+  "B": 1,
+  "formula": "\u25c7p",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.0992559998849174,
+  "stlcgpp_ms": 0.6243699999686214
+ },
+ {
+  "T": 1024,
+  "B": 1,
+  "formula": "\u25c7p",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.42746100007207133,
+  "stlcgpp_ms": 0.7709540004725568
+ },
+ {
+  "T": 1024,
+  "B": 1,
+  "formula": "\u25c7p",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.14215600003808504,
+  "stlcgpp_ms": 0.7638210008735768
+ },
+ {
+  "T": 1024,
+  "B": 1,
+  "formula": "\u25c7p",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.6215739995241165,
+  "stlcgpp_ms": 1.097356000173022
+ },
+ {
+  "T": 1024,
+  "B": 1,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.1802080005290918,
+  "stlcgpp_ms": 1.2651910001295619
+ },
+ {
+  "T": 1024,
+  "B": 1,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.706643999365042,
+  "stlcgpp_ms": 1.5704630004620412
+ },
+ {
+  "T": 1024,
+  "B": 1,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.29593500039482024,
+  "stlcgpp_ms": 1.6222889998971368
+ },
+ {
+  "T": 1024,
+  "B": 1,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.3025799999013543,
+  "stlcgpp_ms": 2.2506169998450787
+ },
+ {
+  "T": 1024,
+  "B": 1,
+  "formula": "p U q",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.2781809998850804,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 1024,
+  "B": 1,
+  "formula": "p U q",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.8765129996390897,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 1024,
+  "B": 1,
+  "formula": "p U q",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.5007390000173473,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 1024,
+  "B": 1,
+  "formula": "p U q",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.7692149995127693,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 1024,
+  "B": 1,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.3184669994880096,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 1024,
+  "B": 1,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.1860429995067534,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 1024,
+  "B": 1,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.5980599999020342,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 1024,
+  "B": 1,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 2.0136030007051886,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 1024,
+  "B": 16,
+  "formula": "\u25c7p",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.11301199992885813,
+  "stlcgpp_ms": 2.455220000229019
+ },
+ {
+  "T": 1024,
+  "B": 16,
+  "formula": "\u25c7p",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.3734299998541246,
+  "stlcgpp_ms": 3.907130000698089
+ },
+ {
+  "T": 1024,
+  "B": 16,
+  "formula": "\u25c7p",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.14087399995332817,
+  "stlcgpp_ms": 4.766340999594831
+ },
+ {
+  "T": 1024,
+  "B": 16,
+  "formula": "\u25c7p",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.659446000099706,
+  "stlcgpp_ms": 8.62970799971663
+ },
+ {
+  "T": 1024,
+  "B": 16,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.17926500004250556,
+  "stlcgpp_ms": 5.495856999914395
+ },
+ {
+  "T": 1024,
+  "B": 16,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.7218020000436809,
+  "stlcgpp_ms": 9.142950999375898
+ },
+ {
+  "T": 1024,
+  "B": 16,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.2893719993153354,
+  "stlcgpp_ms": 10.159665000173845
+ },
+ {
+  "T": 1024,
+  "B": 16,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.1678080009005498,
+  "stlcgpp_ms": 18.693323999286804
+ },
+ {
+  "T": 1024,
+  "B": 16,
+  "formula": "p U q",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 1.8634619991644286,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 1024,
+  "B": 16,
+  "formula": "p U q",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 7.342526999309484,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 1024,
+  "B": 16,
+  "formula": "p U q",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 4.882958999587572,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 1024,
+  "B": 16,
+  "formula": "p U q",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 19.356776999302383,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 1024,
+  "B": 16,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 1.9288639996375423,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 1024,
+  "B": 16,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 7.4879200001305435,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 1024,
+  "B": 16,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 5.006078999940655,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 1024,
+  "B": 16,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 20.766089000062493,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 4096,
+  "B": 1,
+  "formula": "\u25c7p",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.10352400022384245,
+  "stlcgpp_ms": 8.814666000034777
+ },
+ {
+  "T": 4096,
+  "B": 1,
+  "formula": "\u25c7p",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.4185540001344634,
+  "stlcgpp_ms": 10.002160999647458
+ },
+ {
+  "T": 4096,
+  "B": 1,
+  "formula": "\u25c7p",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.27766000039264327,
+  "stlcgpp_ms": 10.55945400003111
+ },
+ {
+  "T": 4096,
+  "B": 1,
+  "formula": "\u25c7p",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.7634739997447468,
+  "stlcgpp_ms": 13.919579999310372
+ },
+ {
+  "T": 4096,
+  "B": 1,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 0.1687260000835522,
+  "stlcgpp_ms": 17.624031000195828
+ },
+ {
+  "T": 4096,
+  "B": 1,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 0.6722199996147538,
+  "stlcgpp_ms": 22.278701999312034
+ },
+ {
+  "T": 4096,
+  "B": 1,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 0.3153910001856275,
+  "stlcgpp_ms": 22.78670499981672
+ },
+ {
+  "T": 4096,
+  "B": 1,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 1.271762999749626,
+  "stlcgpp_ms": 35.83075499955157
+ },
+ {
+  "T": 4096,
+  "B": 1,
+  "formula": "p U q",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 3.311424999992596,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 4096,
+  "B": 1,
+  "formula": "p U q",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 8.687166999152396,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 4096,
+  "B": 1,
+  "formula": "p U q",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 6.067217999770946,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 4096,
+  "B": 1,
+  "formula": "p U q",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 20.18932900045911,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 4096,
+  "B": 1,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "exact",
+  "pass": "fwd",
+  "telos_ms": 2.838859999428678,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 4096,
+  "B": 1,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "exact",
+  "pass": "fwd+bwd",
+  "telos_ms": 8.099777000097674,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 4096,
+  "B": 1,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "lse",
+  "pass": "fwd",
+  "telos_ms": 6.0841599997729645,
+  "stlcgpp_ms": null
+ },
+ {
+  "T": 4096,
+  "B": 1,
+  "formula": "(p\u2228q) U (p\u2227q)",
+  "mode": "lse",
+  "pass": "fwd+bwd",
+  "telos_ms": 20.298893000472162,
+  "stlcgpp_ms": null
+ }
+]

@@ -3,13 +3,16 @@ from __future__ import annotations
 import pytest
 import torch
 
-from telos.algebras import Algebra, Boolean, Goedel, Lukasiewicz, Product, Robustness
+from telos.algebras import (
+    Algebra, Boolean, Goedel, Lukasiewicz, Product, Robustness, Frank,
+    Hamacher, Yager, SchweizerSklar, AczelAlsina, Dombi, SugenoWeber, LSE,
+    KleeneDienes,
+)
 from telos.algebras.properties import (
     commutative, associative, idempotent, absorption,
     distributive, involutive, de_morgan, complementary, residuated,
 )
 
-algebras = [Boolean, Goedel, Lukasiewicz, Product, Robustness]
 n = 50
 
 laws = [
@@ -27,13 +30,26 @@ laws = [
     ('residuation',      lambda A, x, y, z: residuated(A.meet, A.implies)(x, y, z)),
 ]
 
-fails: dict[type[Algebra], set[str]] = {
-    Boolean: set(),
-    Goedel: {'complementarity'},
-    Lukasiewicz: {'meet_idempotent', 'join_idempotent', 'absorption', 'distributivity'},
-    Product: {'meet_idempotent', 'join_idempotent', 'absorption', 'distributivity', 'complementarity'},
-    Robustness: {'complementarity'},
-}
+strict = {'meet_idempotent', 'join_idempotent', 'absorption', 'distributivity', 'complementarity'}
+nilpotent = {'meet_idempotent', 'join_idempotent', 'absorption', 'distributivity'}
+
+instances: list[tuple[Algebra, set[str]]] = [
+    (Boolean(), set()),
+    (Goedel(), {'complementarity'}),
+    (Lukasiewicz(), nilpotent),
+    (Product(), strict),
+    (Robustness(), {'complementarity'}),
+    (Frank(p=0.5, trainable=False), strict),
+    (Frank(p=2., trainable=False, upper=True), strict),
+    (Hamacher(p=2., trainable=False), strict),
+    (Yager(p=2., trainable=False), strict),
+    (SchweizerSklar(p=2., trainable=False), nilpotent),
+    (AczelAlsina(p=2., trainable=False), strict),
+    (Dombi(p=2., trainable=False), strict),
+    (SugenoWeber(p=1., trainable=False), strict),
+    (LSE(p=2., trainable=False), strict),
+    (KleeneDienes(), {'complementarity'}),
+]
 
 
 @pytest.fixture(scope='module')
@@ -48,8 +64,7 @@ def xyz(algebra: Algebra, samples) -> tuple[torch.Tensor, torch.Tensor, torch.Te
     return samples[algebra.dtype]
 
 
-@pytest.mark.parametrize('cls', algebras)
+@pytest.mark.parametrize('A, fails', instances, ids=[type(a).__name__ for a, _ in instances])
 @pytest.mark.parametrize('name, predicate', laws, ids=[law[0] for law in laws])
-def test_law(cls, samples, name, predicate):
-    A = cls()
-    assert predicate(A, *xyz(A, samples)) == (name not in fails[cls])
+def test_law(A, fails, samples, name, predicate):
+    assert predicate(A, *xyz(A, samples)) == (name not in fails)
