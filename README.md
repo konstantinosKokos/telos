@@ -175,3 +175,16 @@ Same formula, multiple algebras and evaluations across two trace dtypes.
 - Telos evaluates LTL over finite, fixed-duration traces and cannot work with infinite streams.
 - `X(Φ)` is padded with `algebra.bottom` past the last time step, biasing trace-edge readings toward dissatisfaction.
 - Every algebra is associated with its own domain; you're responsible for using the right dtype.
+
+## Benchmarks
+
+### Comparison to STLCG++
+
+With STL robustness as the target algebra, Telos reproduces [STLCG++](https://github.com/UW-CTRL/stlcg-plus-plus)
+valuations exactly, over randomly generated formulas and traces. The two differ in evaluation cost:
+Telos' scan-based temporal operators run in linear (`◇`, `□`) and quadratic time (unbounded `U`), where STLCG++'s
+masking is quadratic and cubic respectively, making it unworkable for longer traces.
+
+![scaling](benchmarks/stlcgpp/scaling.png)
+
+Parity checks and measurements: [`benchmarks/stlcgpp/benchmark.ipynb`](benchmarks/stlcgpp/benchmark.ipynb).
