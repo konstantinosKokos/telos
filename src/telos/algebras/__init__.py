@@ -1,4 +1,6 @@
-from .base import Algebra
+from .base import Algebra, TensorAlgebra, Archimedean
+from .lifted import State, Lifted
+from .boltzmann import Boltzmann
 from .goedel import Goedel
 from .boolean import Boolean
 from .product import Product

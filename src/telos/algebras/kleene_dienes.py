@@ -1,10 +1,10 @@
 import torch
 from torch import Tensor
 
-from .base import FuzzyBase
+from .base import Fuzzy
 
 
-class KleeneDienes(FuzzyBase):
+class KleeneDienes(Fuzzy):
     def meet(self, x: Tensor, y: Tensor) -> Tensor:
         return torch.minimum(x, y)
 

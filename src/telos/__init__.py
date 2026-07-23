@@ -4,7 +4,8 @@ from .syntax import (
     eventually, always, iff)
 from .deduction import Trace, Judgement, Model, mkTrace
 from .algebras import (
-    Algebra, Boolean, Goedel, Product, Lukasiewicz, Robustness, Frank,
+    Algebra, TensorAlgebra, Archimedean, Lifted, State,
+    Boolean, Goedel, Product, Lukasiewicz, Robustness, Frank,
     Hamacher, Yager, SchweizerSklar, AczelAlsina, Dombi, SugenoWeber, LSE,
-    KleeneDienes,
+    KleeneDienes, Boltzmann,
 )

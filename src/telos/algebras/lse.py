@@ -2,10 +2,10 @@ import torch
 from torch import Tensor
 from torch.nn import Parameter
 
-from .base import Algebra
+from .base import TensorAlgebra
 
 
-class LSE(Algebra):
+class LSE(TensorAlgebra):
     def __init__(self, p: float, trainable: bool, eps: float = 1e-3):
         super().__init__()
         self._p = Parameter(torch.tensor(float(p)), requires_grad=trainable)

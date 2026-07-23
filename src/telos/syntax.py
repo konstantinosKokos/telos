@@ -164,5 +164,3 @@ def formula_hash(f: Formula) -> int:
         case Implies(l, r): return hash(('i', formula_hash(l), formula_hash(r)))
         case Until(l, r): return hash(('u', formula_hash(l), formula_hash(r)))
         case _: raise ValueError
-
-

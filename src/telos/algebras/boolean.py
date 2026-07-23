@@ -1,10 +1,10 @@
 import torch
 from torch import Tensor
 
-from .base import Algebra
+from .base import TensorAlgebra
 
 
-class Boolean(Algebra):
+class Boolean(TensorAlgebra):
     def __init__(self):
         super().__init__()
         self.register_buffer('top', torch.tensor(True))
