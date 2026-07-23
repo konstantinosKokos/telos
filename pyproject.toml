@@ -17,7 +17,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest"]
+test = ["pytest", "hypothesis", "numpy"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
