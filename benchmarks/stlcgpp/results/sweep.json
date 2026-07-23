@@ -1,0 +1,866 @@
+[
+ {
+  "T": 64,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "telos-exact",
+  "ms": 0.7369810009549838,
+  "peak_gb": 7.68e-06,
+  "compile_s": 0.1997959410000476,
+  "status": "ok"
+ },
+ {
+  "T": 64,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "masked-exact",
+  "ms": 1.2457129996619187,
+  "peak_gb": 0.017256448,
+  "compile_s": 0.20264786199913942,
+  "status": "ok"
+ },
+ {
+  "T": 64,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "recurrent-exact",
+  "ms": 31.242288001521956,
+  "peak_gb": 0.01717504,
+  "compile_s": 0.20081553800264373,
+  "status": "ok"
+ },
+ {
+  "T": 64,
+  "formula": "p U q",
+  "impl": "telos-exact",
+  "ms": 0.799277000623988,
+  "peak_gb": 0.00014592,
+  "compile_s": 0.2028695549997792,
+  "status": "ok"
+ },
+ {
+  "T": 64,
+  "formula": "p U q",
+  "impl": "masked-exact",
+  "ms": 23.436505001882324,
+  "peak_gb": 0.007374336,
+  "compile_s": 0.1464887740003178,
+  "status": "ok"
+ },
+ {
+  "T": 64,
+  "formula": "p U q",
+  "impl": "recurrent-exact",
+  "ms": 1062.1610580019478,
+  "peak_gb": 0.02037248,
+  "compile_s": 1.3617874049996317,
+  "status": "ok"
+ },
+ {
+  "T": 96,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "telos-exact",
+  "ms": 0.7005519983067643,
+  "peak_gb": 8.704e-06,
+  "compile_s": 0.20029953499761177,
+  "status": "ok"
+ },
+ {
+  "T": 96,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "masked-exact",
+  "ms": 1.286881000851281,
+  "peak_gb": 0.017524736,
+  "compile_s": 0.19898022200140986,
+  "status": "ok"
+ },
+ {
+  "T": 96,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "recurrent-exact",
+  "ms": 43.42134200123837,
+  "peak_gb": 0.017266176,
+  "compile_s": 0.21725464500195812,
+  "status": "ok"
+ },
+ {
+  "T": 96,
+  "formula": "p U q",
+  "impl": "telos-exact",
+  "ms": 0.8465259998047259,
+  "peak_gb": 0.000325632,
+  "compile_s": 0.19667008300166344,
+  "status": "ok"
+ },
+ {
+  "T": 96,
+  "formula": "p U q",
+  "impl": "masked-exact",
+  "ms": 33.850882999104215,
+  "peak_gb": 0.024848384,
+  "compile_s": 0.15826867500072694,
+  "status": "ok"
+ },
+ {
+  "T": 96,
+  "formula": "p U q",
+  "impl": "recurrent-exact",
+  "ms": 2408.4629930002848,
+  "peak_gb": 0.025636352,
+  "compile_s": 2.680727727001795,
+  "status": "ok"
+ },
+ {
+  "T": 128,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "telos-exact",
+  "ms": 0.6982980012253392,
+  "peak_gb": 8.704e-06,
+  "compile_s": 0.20067783200283884,
+  "status": "ok"
+ },
+ {
+  "T": 128,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "masked-exact",
+  "ms": 1.3188099983381107,
+  "peak_gb": 0.017897472,
+  "compile_s": 0.19904427100118482,
+  "status": "ok"
+ },
+ {
+  "T": 128,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "recurrent-exact",
+  "ms": 57.96738799836021,
+  "peak_gb": 0.017372672,
+  "compile_s": 0.23196742399886716,
+  "status": "ok"
+ },
+ {
+  "T": 128,
+  "formula": "p U q",
+  "impl": "telos-exact",
+  "ms": 0.8722339989617467,
+  "peak_gb": 0.000576512,
+  "compile_s": 0.19780803399771685,
+  "status": "ok"
+ },
+ {
+  "T": 128,
+  "formula": "p U q",
+  "impl": "masked-exact",
+  "ms": 46.28378100096597,
+  "peak_gb": 0.058853376,
+  "compile_s": 0.17376229900037288,
+  "status": "ok"
+ },
+ {
+  "T": 128,
+  "formula": "p U q",
+  "impl": "recurrent-exact",
+  "ms": 4144.490320999466,
+  "peak_gb": 0.034283008,
+  "compile_s": 4.479892890001793,
+  "status": "ok"
+ },
+ {
+  "T": 192,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "telos-exact",
+  "ms": 0.7277229997271206,
+  "peak_gb": 1.3312e-05,
+  "compile_s": 0.2011376400005247,
+  "status": "ok"
+ },
+ {
+  "T": 192,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "masked-exact",
+  "ms": 1.2352640005701687,
+  "peak_gb": 0.018966528,
+  "compile_s": 0.2033954190010263,
+  "status": "ok"
+ },
+ {
+  "T": 192,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "recurrent-exact",
+  "ms": 85.89781300179311,
+  "peak_gb": 0.017639424,
+  "compile_s": 0.2615780550004274,
+  "status": "ok"
+ },
+ {
+  "T": 192,
+  "formula": "p U q",
+  "impl": "telos-exact",
+  "ms": 0.8327399991685525,
+  "peak_gb": 0.001293824,
+  "compile_s": 0.19721543000196107,
+  "status": "ok"
+ },
+ {
+  "T": 192,
+  "formula": "p U q",
+  "impl": "masked-exact",
+  "ms": 69.18799100094475,
+  "peak_gb": 0.199527424,
+  "compile_s": 0.2063670319985249,
+  "status": "ok"
+ },
+ {
+  "T": 192,
+  "formula": "p U q",
+  "impl": "recurrent-exact",
+  "ms": 9628.110196001217,
+  "peak_gb": 0.06517504,
+  "compile_s": 10.202671570001257,
+  "status": "ok"
+ },
+ {
+  "T": 256,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "telos-exact",
+  "ms": 0.724276000255486,
+  "peak_gb": 1.4336e-05,
+  "compile_s": 0.2019920569982787,
+  "status": "ok"
+ },
+ {
+  "T": 256,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "masked-exact",
+  "ms": 1.300877000176115,
+  "peak_gb": 0.02045952,
+  "compile_s": 0.19849926399911055,
+  "status": "ok"
+ },
+ {
+  "T": 256,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "recurrent-exact",
+  "ms": 119.6659630004433,
+  "peak_gb": 0.017968128,
+  "compile_s": 0.29146200999821303,
+  "status": "ok"
+ },
+ {
+  "T": 256,
+  "formula": "p U q",
+  "impl": "telos-exact",
+  "ms": 0.851363998663146,
+  "peak_gb": 0.002297856,
+  "compile_s": 0.195682907000446,
+  "status": "ok"
+ },
+ {
+  "T": 256,
+  "formula": "p U q",
+  "impl": "masked-exact",
+  "ms": 91.48835299856728,
+  "peak_gb": 0.47028992,
+  "compile_s": 0.24073258700082079,
+  "status": "ok"
+ },
+ {
+  "T": 256,
+  "formula": "p U q",
+  "impl": "recurrent-exact",
+  "ms": 17309.749069001555,
+  "peak_gb": 0.119160832,
+  "compile_s": 17.9741471419984,
+  "status": "ok"
+ },
+ {
+  "T": 384,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "telos-exact",
+  "ms": 0.7638810020580422,
+  "peak_gb": 2.048e-05,
+  "compile_s": 0.19898822200048016,
+  "status": "ok"
+ },
+ {
+  "T": 384,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "masked-exact",
+  "ms": 1.3394790003076196,
+  "peak_gb": 0.02511872,
+  "compile_s": 0.21126861199809355,
+  "status": "ok"
+ },
+ {
+  "T": 384,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "recurrent-exact",
+  "ms": 177.1079190002638,
+  "peak_gb": 0.019017728,
+  "compile_s": 0.3626247889988008,
+  "status": "ok"
+ },
+ {
+  "T": 384,
+  "formula": "p U q",
+  "impl": "telos-exact",
+  "ms": 0.9629740015952848,
+  "peak_gb": 0.00516608,
+  "compile_s": 0.1987154680027743,
+  "status": "ok"
+ },
+ {
+  "T": 384,
+  "formula": "p U q",
+  "impl": "masked-exact",
+  "ms": 141.78496800013818,
+  "peak_gb": 1.58663168,
+  "compile_s": 0.27236576300128945,
+  "status": "ok"
+ },
+ {
+  "T": 384,
+  "formula": "p U q",
+  "impl": "recurrent-exact",
+  "ms": 39270.12169799855,
+  "peak_gb": 0.322003968,
+  "compile_s": 40.910228519001976,
+  "status": "ok"
+ },
+ {
+  "T": 512,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "telos-exact",
+  "ms": 0.7502659973397385,
+  "peak_gb": 2.6624e-05,
+  "compile_s": 0.19950861699908273,
+  "status": "ok"
+ },
+ {
+  "T": 512,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "masked-exact",
+  "ms": 1.278032999834977,
+  "peak_gb": 0.047473152,
+  "compile_s": 0.2008118869998725,
+  "status": "ok"
+ },
+ {
+  "T": 512,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "recurrent-exact",
+  "ms": 234.38664700006484,
+  "peak_gb": 0.020463616,
+  "compile_s": 0.42490237099991646,
+  "status": "ok"
+ },
+ {
+  "T": 512,
+  "formula": "p U q",
+  "impl": "telos-exact",
+  "ms": 0.8483989986416418,
+  "peak_gb": 0.009181184,
+  "compile_s": 0.19699560899971402,
+  "status": "ok"
+ },
+ {
+  "T": 512,
+  "formula": "p U q",
+  "impl": "masked-exact",
+  "ms": 211.3573649985483,
+  "peak_gb": 3.760200192,
+  "compile_s": 0.3473864029983815,
+  "status": "ok"
+ },
+ {
+  "T": 512,
+  "formula": "p U q",
+  "impl": "recurrent-exact",
+  "ms": 71103.31969500112,
+  "peak_gb": 0.693143552,
+  "compile_s": 73.00353395500133,
+  "status": "ok"
+ },
+ {
+  "T": 768,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "telos-exact",
+  "ms": 0.7905599995865487,
+  "peak_gb": 3.8912e-05,
+  "compile_s": 0.20039043300130288,
+  "status": "ok"
+ },
+ {
+  "T": 768,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "masked-exact",
+  "ms": 1.313840999500826,
+  "peak_gb": 0.08549632,
+  "compile_s": 0.2015069039989612,
+  "status": "ok"
+ },
+ {
+  "T": 768,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "recurrent-exact",
+  "ms": 354.2107749999559,
+  "peak_gb": 0.02453504,
+  "compile_s": 0.5386421920011344,
+  "status": "ok"
+ },
+ {
+  "T": 768,
+  "formula": "p U q",
+  "impl": "telos-exact",
+  "ms": 0.9118480011238717,
+  "peak_gb": 0.020652032,
+  "compile_s": 0.19887036500222166,
+  "status": "ok"
+ },
+ {
+  "T": 768,
+  "formula": "p U q",
+  "impl": "masked-exact",
+  "ms": null,
+  "peak_gb": null,
+  "compile_s": null,
+  "status": "oom"
+ },
+ {
+  "T": 768,
+  "formula": "p U q",
+  "impl": "recurrent-exact",
+  "ms": 158953.18708000195,
+  "peak_gb": 2.142949376,
+  "compile_s": 164.38534086000072,
+  "status": "ok"
+ },
+ {
+  "T": 1024,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "telos-exact",
+  "ms": 0.7459459993697237,
+  "peak_gb": 5.12e-05,
+  "compile_s": 0.2118115109988139,
+  "status": "ok"
+ },
+ {
+  "T": 1024,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "masked-exact",
+  "ms": 1.6191409995371941,
+  "peak_gb": 0.13872384,
+  "compile_s": 0.20685657300055027,
+  "status": "ok"
+ },
+ {
+  "T": 1024,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "recurrent-exact",
+  "ms": 472.31202900002245,
+  "peak_gb": 0.030179328,
+  "compile_s": 0.6801164779972169,
+  "status": "ok"
+ },
+ {
+  "T": 1024,
+  "formula": "p U q",
+  "impl": "telos-exact",
+  "ms": 0.8448009975836612,
+  "peak_gb": 0.03881216,
+  "compile_s": 0.20345309900221764,
+  "status": "ok"
+ },
+ {
+  "T": 1024,
+  "formula": "p U q",
+  "impl": "recurrent-exact",
+  "ms": 284653.21520900034,
+  "peak_gb": 4.867299328,
+  "compile_s": 293.6909097909993,
+  "status": "ok"
+ },
+ {
+  "T": 1536,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "telos-exact",
+  "ms": 0.7315799994103145,
+  "peak_gb": 7.5776e-05,
+  "compile_s": 0.2050190929985547,
+  "status": "ok"
+ },
+ {
+  "T": 1536,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "masked-exact",
+  "ms": 3.1661690009059384,
+  "peak_gb": 0.291715584,
+  "compile_s": 0.21057313200071803,
+  "status": "ok"
+ },
+ {
+  "T": 1536,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "recurrent-exact",
+  "ms": 713.2947870013595,
+  "peak_gb": 0.046186496,
+  "compile_s": 0.9159300780011108,
+  "status": "ok"
+ },
+ {
+  "T": 1536,
+  "formula": "p U q",
+  "impl": "telos-exact",
+  "ms": 1.327295001829043,
+  "peak_gb": 0.087314944,
+  "compile_s": 0.20455419199788594,
+  "status": "ok"
+ },
+ {
+  "T": 1536,
+  "formula": "p U q",
+  "impl": "recurrent-exact",
+  "ms": null,
+  "peak_gb": null,
+  "compile_s": null,
+  "status": "oom"
+ },
+ {
+  "T": 2048,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "telos-exact",
+  "ms": 0.7424269970215391,
+  "peak_gb": 0.000100352,
+  "compile_s": 0.22578696599885006,
+  "status": "ok"
+ },
+ {
+  "T": 2048,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "masked-exact",
+  "ms": 5.3060140016896185,
+  "peak_gb": 0.386236928,
+  "compile_s": 0.22481786899879808,
+  "status": "ok"
+ },
+ {
+  "T": 2048,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "recurrent-exact",
+  "ms": 956.2028990003455,
+  "peak_gb": 0.06848512,
+  "compile_s": 1.2007883500009484,
+  "status": "ok"
+ },
+ {
+  "T": 2048,
+  "formula": "p U q",
+  "impl": "telos-exact",
+  "ms": 2.2959310008445755,
+  "peak_gb": 0.155216384,
+  "compile_s": 0.23748231200079317,
+  "status": "ok"
+ },
+ {
+  "T": 3072,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "telos-exact",
+  "ms": 0.706279999576509,
+  "peak_gb": 0.000149504,
+  "compile_s": 0.2086269130013534,
+  "status": "ok"
+ },
+ {
+  "T": 3072,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "masked-exact",
+  "ms": 13.341351997951278,
+  "peak_gb": 0.65891584,
+  "compile_s": 0.21232258300005924,
+  "status": "ok"
+ },
+ {
+  "T": 3072,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "recurrent-exact",
+  "ms": 1716.5746350001427,
+  "peak_gb": 0.131956736,
+  "compile_s": 1.885477992997039,
+  "status": "ok"
+ },
+ {
+  "T": 3072,
+  "formula": "p U q",
+  "impl": "telos-exact",
+  "ms": 4.5781560002069455,
+  "peak_gb": 0.330328064,
+  "compile_s": 0.21284707199811237,
+  "status": "ok"
+ },
+ {
+  "T": 4096,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "telos-exact",
+  "ms": 0.7195750004029833,
+  "peak_gb": 0.000198656,
+  "compile_s": 0.2066199079999933,
+  "status": "ok"
+ },
+ {
+  "T": 4096,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "masked-exact",
+  "ms": 20.566786002746085,
+  "peak_gb": 1.040646656,
+  "compile_s": 0.21270178600025247,
+  "status": "ok"
+ },
+ {
+  "T": 4096,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "recurrent-exact",
+  "ms": 3039.28944299696,
+  "peak_gb": 0.220594176,
+  "compile_s": 3.1764919880006346,
+  "status": "ok"
+ },
+ {
+  "T": 4096,
+  "formula": "p U q",
+  "impl": "telos-exact",
+  "ms": 7.970426002430031,
+  "peak_gb": 0.587237376,
+  "compile_s": 0.2064930810010992,
+  "status": "ok"
+ },
+ {
+  "T": 64,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "fallback-exact",
+  "ms": 12.629679000383476,
+  "peak_gb": 7.168e-05,
+  "compile_s": 0.20844525500069722,
+  "status": "ok"
+ },
+ {
+  "T": 64,
+  "formula": "p U q",
+  "impl": "fallback-exact",
+  "ms": 12.735868000163464,
+  "peak_gb": 0.000144896,
+  "compile_s": 0.19963298000220675,
+  "status": "ok"
+ },
+ {
+  "T": 96,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "fallback-exact",
+  "ms": 18.690963999688393,
+  "peak_gb": 0.00010496,
+  "compile_s": 0.21575332299835281,
+  "status": "ok"
+ },
+ {
+  "T": 96,
+  "formula": "p U q",
+  "impl": "fallback-exact",
+  "ms": 18.89181099977577,
+  "peak_gb": 0.000300032,
+  "compile_s": 0.20119899100245675,
+  "status": "ok"
+ },
+ {
+  "T": 128,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "fallback-exact",
+  "ms": 24.68015499835019,
+  "peak_gb": 0.000137728,
+  "compile_s": 0.22428117500021472,
+  "status": "ok"
+ },
+ {
+  "T": 128,
+  "formula": "p U q",
+  "impl": "fallback-exact",
+  "ms": 24.697197000932647,
+  "peak_gb": 0.000509952,
+  "compile_s": 0.20683763499982888,
+  "status": "ok"
+ },
+ {
+  "T": 192,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "fallback-exact",
+  "ms": 36.28961399954278,
+  "peak_gb": 0.000206336,
+  "compile_s": 0.2364159179996932,
+  "status": "ok"
+ },
+ {
+  "T": 192,
+  "formula": "p U q",
+  "impl": "fallback-exact",
+  "ms": 38.22914499687613,
+  "peak_gb": 0.001193472,
+  "compile_s": 0.23480262900193338,
+  "status": "ok"
+ },
+ {
+  "T": 256,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "fallback-exact",
+  "ms": 48.80273599701468,
+  "peak_gb": 0.000272384,
+  "compile_s": 0.2460265959998651,
+  "status": "ok"
+ },
+ {
+  "T": 256,
+  "formula": "p U q",
+  "impl": "fallback-exact",
+  "ms": 52.64410599920666,
+  "peak_gb": 0.002033664,
+  "compile_s": 0.25598780200016336,
+  "status": "ok"
+ },
+ {
+  "T": 384,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "fallback-exact",
+  "ms": 73.08056700276211,
+  "peak_gb": 0.00040704,
+  "compile_s": 0.271842888003448,
+  "status": "ok"
+ },
+ {
+  "T": 384,
+  "formula": "p U q",
+  "impl": "fallback-exact",
+  "ms": 75.39588099825778,
+  "peak_gb": 0.004573184,
+  "compile_s": 0.2651879219993134,
+  "status": "ok"
+ },
+ {
+  "T": 512,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "fallback-exact",
+  "ms": 96.92011800143518,
+  "peak_gb": 0.000541696,
+  "compile_s": 0.2963589259998116,
+  "status": "ok"
+ },
+ {
+  "T": 512,
+  "formula": "p U q",
+  "impl": "fallback-exact",
+  "ms": 97.50817899839603,
+  "peak_gb": 0.008128512,
+  "compile_s": 0.287430233998748,
+  "status": "ok"
+ },
+ {
+  "T": 768,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "fallback-exact",
+  "ms": 143.31856499848072,
+  "peak_gb": 0.000811008,
+  "compile_s": 0.348359306997736,
+  "status": "ok"
+ },
+ {
+  "T": 768,
+  "formula": "p U q",
+  "impl": "fallback-exact",
+  "ms": 143.36983999965014,
+  "peak_gb": 0.018286592,
+  "compile_s": 0.3338621420007257,
+  "status": "ok"
+ },
+ {
+  "T": 1024,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "fallback-exact",
+  "ms": 190.41409499914153,
+  "peak_gb": 0.001081344,
+  "compile_s": 0.3952651719991991,
+  "status": "ok"
+ },
+ {
+  "T": 1024,
+  "formula": "p U q",
+  "impl": "fallback-exact",
+  "ms": 191.96335399828968,
+  "peak_gb": 0.034609664,
+  "compile_s": 0.3848965949982812,
+  "status": "ok"
+ },
+ {
+  "T": 1536,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "fallback-exact",
+  "ms": 289.3246690000524,
+  "peak_gb": 0.001622016,
+  "compile_s": 0.501910905000841,
+  "status": "ok"
+ },
+ {
+  "T": 1536,
+  "formula": "p U q",
+  "impl": "fallback-exact",
+  "ms": 289.99801100144396,
+  "peak_gb": 0.077865472,
+  "compile_s": 0.48457955599951674,
+  "status": "ok"
+ },
+ {
+  "T": 2048,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "fallback-exact",
+  "ms": 413.2514280026953,
+  "peak_gb": 0.002162688,
+  "compile_s": 0.6118287229983252,
+  "status": "ok"
+ },
+ {
+  "T": 2048,
+  "formula": "p U q",
+  "impl": "fallback-exact",
+  "ms": 383.7200429989025,
+  "peak_gb": 0.138422784,
+  "compile_s": 0.5844578209980682,
+  "status": "ok"
+ },
+ {
+  "T": 3072,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "fallback-exact",
+  "ms": 601.0212340006547,
+  "peak_gb": 0.003244032,
+  "compile_s": 0.8104599780017452,
+  "status": "ok"
+ },
+ {
+  "T": 3072,
+  "formula": "p U q",
+  "impl": "fallback-exact",
+  "ms": 579.6842660020047,
+  "peak_gb": 0.292554752,
+  "compile_s": 0.7990050169973983,
+  "status": "ok"
+ },
+ {
+  "T": 4096,
+  "formula": "\u25a1(p \u2192 \u25c7q)",
+  "impl": "fallback-exact",
+  "ms": 779.2405340005644,
+  "peak_gb": 0.004325376,
+  "compile_s": 1.0093622210006288,
+  "status": "ok"
+ },
+ {
+  "T": 4096,
+  "formula": "p U q",
+  "impl": "fallback-exact",
+  "ms": 776.8296709982678,
+  "peak_gb": 0.520095744,
+  "compile_s": 0.9806019300012849,
+  "status": "ok"
+ }
+]

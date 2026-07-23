@@ -61,8 +61,9 @@ for adding more.
 
 #### Abstract
 
-An `Algebra` is a `torch.nn.Module` that fixes the semantics on a carrier set. It declares two designated elements 
-(`top` and `bottom`, registered as buffers) and four pointwise primitives:
+An `Algebra[T]` is a `torch.nn.Module` that fixes the semantics on a carrier type `T`. It declares two designated 
+elements (`top` and `bottom`), four pointwise primitives, and the plumbing that moves values in and out of the 
+carrier (`embed`, `readout`, `shift`, `fmap`):
 
 | Connective   | Method          |
 |--------------|-----------------|
@@ -71,14 +72,24 @@ An `Algebra` is a `torch.nn.Module` that fixes the semantics on a carrier set. I
 | `Φ₁ → Φ₂`    | `implies(x, y)` |
 | `¬Φ`         | `neg(x)`        |
 
-Sequence reductions (`exists`, `forall`, `running_meet`, `running_join`, `span_meet`, `span_join`) are derived from the 
-primitives via functional iterators (`scan`, `fold`, and a triangular-mask `span` combinator). Each can be overridden 
-with a vectorized closed form when one exists.
+Temporal operators are built on the sequence reductions (`exists`, `forall`, `running_meet`, `running_join`, 
+`span_meet`). Three intermediate classes fix the carrier and derive the reductions, each along a different route:
+
+- `TensorAlgebra` interprets formulas directly on tensors of truth values (`T = Tensor`); `top` and `bottom` are 
+  registered as buffers and the carrier plumbing is trivial. Sequence reductions are derived from the pointwise 
+  primitives via functional iterators (`scan`, `fold`, and a triangular-mask `span` combinator); each can be 
+  overridden with a vectorized closed form when one exists. A convenience subclass `Fuzzy` handles the common case 
+  of a `[0, 1]` carrier with `neg(x) = 1 - x`.
+- `Archimedean` specializes `TensorAlgebra` to t-norms with an additive generator: implement the generator pair 
+  `g`/`g_inv`, and the pointwise operations along with vectorized sequence reductions (sums and cumulative sums in 
+  generator space) come for free.
+- `Lifted[S: State]` interprets formulas on a monoidal state carrier rather than plain values, for semantics whose 
+  sequence reductions are not folds of their binary operation. Implementations provide an associative `combine` on 
+  states and embeddings that are sections of `readout` (i.e. `readout ∘ embed = id`); the reductions are then 
+  derived as logarithmic-depth parallel scans.
 
 Since `Algebra` extends `Module`, its parameters (if any) are first-class, and can optionally be trained end-to-end 
 just like a standard pytorch module.
-
-A convenience subclass `FuzzyBase` handles the common case of a `[0,1]` carrier with `neg(x) = 1 - x`.
 
 #### Existing Implementations
 
@@ -108,20 +119,27 @@ See `algebras` for the implementations, and `tests/test_properties.py` for the c
 | `Dombi`          | `[0, 1]`   |   ✓   |   ✓   | [^b]  | [^b]  | [^b]  |       |
 | `SugenoWeber`    | `[0, 1]`   |   ✓   |   ✓   |       |       |       | [^c]  |
 | `LSE`            | `ℝ ∪ {±∞}` |   ✓   |   ✓   | [^b]  | [^b]  | [^b]  |       |
+| `Boltzmann`[^f]  | `ℝ`        |   ✓   |   ✓   |   ✓   | [^b]  | [^b]  |       |
 
 [^a]: `Implies` is _not_ differentiable in its first argument.
 [^b]: When `p → ∞`.
 [^c]: When `p → 0`.
 [^d]: When `p = 1`.
 [^e]: When `p ≥ 1`.
+[^f]: Unlike every other algebra in the table, binary `∧`/`∨` are non-associative at finite `β` (exact as `β → ∞`); 
+associativity holds in state space, from which the sequence reductions are derived.
 
 
 #### Writing your Own
 
-Subclass `Algebra` (or `FuzzyBase`) and implement or inherit the top and bottom elements and the four 
-pointwise primitives. Sequence reductions inherit defaults; override them where a vectorized closed form exists.
+Pick the entry point that matches your semantics. Subclass `TensorAlgebra` (or `Fuzzy`) and implement or inherit 
+the top and bottom elements and the four pointwise primitives; sequence reductions inherit defaults, which you can 
+override where a vectorized closed form exists. If your t-norm has an additive generator, subclass `Archimedean` 
+and implement just `g`/`g_inv`. If your reductions don't arise as folds of the pointwise primitives, subclass 
+`Lifted` with a `State` carrying an associative `combine`.
 
-See `telos.algebras.goedel` for a minimal reference and `telos.algebras.frank` for an example with a trainable parameter.
+See `telos.algebras.goedel` for a minimal reference, `telos.algebras.frank` for an example with a trainable 
+parameter, and `telos.algebras.boltzmann` for a lifted algebra.
 
 ### Interface
 
@@ -180,11 +198,14 @@ Same formula, multiple algebras and evaluations across two trace dtypes.
 
 ### Comparison to STLCG++
 
-With STL robustness as the target algebra, Telos reproduces [STLCG++](https://github.com/UW-CTRL/stlcg-plus-plus)
-valuations exactly, over randomly generated formulas and traces. The two differ in evaluation cost:
-Telos' scan-based temporal operators run in linear (`◇`, `□`) and quadratic time (unbounded `U`), where STLCG++'s
-masking is quadratic and cubic respectively, making it unworkable for longer traces.
+Three telos algebras map directly to [STLCG++](https://github.com/UW-CTRL/stlcg-plus-plus)'s three approximation
+methods: `Robustness` to `'true'`, `LSE` to `'logsumexp'`, and `Boltzmann` to `'softmax'`. Under each pairing,
+telos reproduces STLCG++ valuations up to finite precision arithmetic, over randomly generated formulas and traces.
+The two differ in evaluation cost: Telos' scan-based temporal operators run in linear (`◇`, `□`) and quadratic time
+(unbounded `U`), where STLCG++'s masking is quadratic and cubic respectively, making it unworkable for longer traces.
 
 ![scaling](benchmarks/stlcgpp/scaling.png)
+![scaling-lse](benchmarks/stlcgpp/scaling_lse.png)
+![scaling-softmax](benchmarks/stlcgpp/scaling_softmax.png)
 
 Parity checks and measurements: [`benchmarks/stlcgpp/benchmark.ipynb`](benchmarks/stlcgpp/benchmark.ipynb).

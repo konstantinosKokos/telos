@@ -20,7 +20,7 @@ import time
 from pathlib import Path
 
 import torch
-from telos import LSE, Model, Robustness, Trace, Until, Variable, always, eventually
+from telos import LSE, Boltzmann, Model, Robustness, Trace, Until, Variable, always, eventually
 
 HERE = Path(__file__).parent
 TS = (64, 96, 128, 192, 256, 384, 512, 768, 1024, 1536, 2048, 3072, 4096)
@@ -97,25 +97,34 @@ def random_formula(depth: int, rng):
 
 
 def translate(formula):
-    """telos Formula to the equivalent STLCG++ formula."""
+    """telos Formula to the equivalent STLCG++ formula.
+
+    STLCG++ flattens nested ∧/∨ chains (`separate_and`/`separate_or`) into a
+    single n-ary reduction, which under non-associative smoothings (softmax)
+    disagrees with evaluating the tree as written. A ¬¬ barrier around chained
+    subformulas defeats the flattening; it is semantically inert since every
+    algebra here has an involutive negation.
+    """
     import stlcgpp.formula as F
     from telos.syntax import AbstractTop, Conjunction, Disjunction, Implies, Negation
     atom = {v: F.GreaterThan(F.Predicate(v, lambda s, i=i: s[..., i]), 0.0)
             for i, v in enumerate(('p', 'q'))}
+    def barrier(phi, cls):
+        return F.Negation(F.Negation(go(phi))) if isinstance(phi, cls) else go(phi)
     def go(phi):
         match phi:
             case Variable(name): return atom[name]
             case Until(AbstractTop(), x): return F.Eventually(go(x))
             case Negation(x): return F.Negation(go(x))
-            case Conjunction(l, r): return F.And(go(l), go(r))
-            case Disjunction(l, r): return F.Or(go(l), go(r))
+            case Conjunction(l, r): return F.And(barrier(l, Conjunction), barrier(r, Conjunction))
+            case Disjunction(l, r): return F.Or(barrier(l, Disjunction), barrier(r, Disjunction))
             case Implies(l, r): return F.Implies(go(l), go(r))
             case Until(l, r): return F.Until(go(l), go(r))
             case _: raise ValueError(phi)
     return go(formula)
 
 
-def parity(n: int = 20, depths: tuple = (2, 4, 6), T: int = 37, seed: int = 0) -> list[dict]:
+def parity(n: int = 20, depths: tuple = (2, 4, 6), T: int = 37, seed: int = 0, tol: float = 1e-5) -> list[dict]:
     import numpy as np
     rng = np.random.default_rng(seed)
     rows = []
@@ -132,7 +141,10 @@ def parity(n: int = 20, depths: tuple = (2, 4, 6), T: int = 37, seed: int = 0) -
             rows.append({'depth': depth, 'formula': repr(formula),
                          'exact': delta(Robustness(), approx_method='true'),
                          'lse': delta(LSE(p=1., trainable=False),
-                                      approx_method='logsumexp', temperature=1.0)})
+                                      approx_method='logsumexp', temperature=1.0),
+                         'softmax': delta(Boltzmann(beta=1., trainable=False),
+                                          approx_method='softmax', temperature=1.0)})
+            assert all(rows[-1][k] < tol for k in ('exact', 'lse', 'softmax')), rows[-1]
     return rows
 
 
@@ -188,21 +200,34 @@ class FallbackRobustness(Robustness):
     span_meet, span_join = _A.span_meet, _A.span_join
 
 
+ALGEBRAS = {  # impl = '{backend}-{method}'
+    'telos-exact': Robustness,
+    'fallback-exact': FallbackRobustness,
+    'telos-lse': lambda: LSE(p=1., trainable=False),
+    'telos-softmax': lambda: Boltzmann(beta=1., trainable=False),
+}
+STL_KW = {'exact': dict(approx_method='true'),
+          'lse': dict(approx_method='logsumexp', temperature=1.0),
+          'softmax': dict(approx_method='softmax', temperature=1.0)}
+
+
 def _cell(T: int, formula: str, impl: str) -> dict:
     row = {'T': T, 'formula': formula, 'impl': impl,
            'ms': None, 'peak_gb': None, 'compile_s': None, 'status': 'ok'}
-    if impl in ('telos', 'fallback'):
-        model = Model(Robustness() if impl == 'telos' else FallbackRobustness()).cuda()
+    if impl in ALGEBRAS:
+        model = Model(ALGEBRAS[impl]()).cuda()
         values = _values(T).cuda()
         def fn():
             x = values.detach().requires_grad_(True)
             model(Trace(x, ('p', 'q')) >> FORMULAS[formula]).sum().backward()
     else:
-        sf = _stl(formula, recurrent=impl == 'recurrent')
+        backend, _, method = impl.partition('-')
+        sf = _stl(formula, recurrent=backend == 'recurrent')
+        kw = STL_KW[method]
         signal = _signal(_values(T)).cuda()
         def fn():
             x = signal.detach().requires_grad_(True)
-            sf(x[0], approx_method='true')[0].backward()
+            sf(x[0], **kw)[0].backward()
     torch.cuda.reset_peak_memory_stats()
     try:
         t0 = time.perf_counter()
@@ -224,12 +249,13 @@ def _cell(T: int, formula: str, impl: str) -> dict:
     return row
 
 
-def sweep(checkpoint: str | None = None) -> list[dict]:
+def sweep(checkpoint: str | None = None,
+          impls: tuple = ('telos-exact', 'fallback-exact', 'masked-exact', 'recurrent-exact')) -> list[dict]:
     """checkpoint: path to dump rows after every cell (crash resilience, live preview)."""
     rows, dead = [], set()
     for T in TS:
         for formula in SWEEP_FORMULAS:
-            for impl in ('telos', 'fallback', 'masked', 'recurrent'):
+            for impl in impls:
                 if (formula, impl) in dead:
                     continue
                 # fresh subprocess per cell: keeps peak-memory readings free of
@@ -275,14 +301,17 @@ def speedups(rows: list[dict]) -> dict:
     return out
 
 
-STYLE = {  # impl -> (color, linestyle); hue = tool, shade = variant (dark: fast path)
-    'telos':     ('#1c5cab', 'solid'),
-    'fallback':  ('#6da7ec', 'solid'),
-    'masked':    ('#0d8c5c', 'solid'),
-    'recurrent': ('#52c69a', 'solid'),
+HUES = {  # hue = tool, shade = variant (dark: fast path); method varies per figure, not per line
+    'telos': '#1c5cab',
+    'fallback': '#6da7ec',
+    'masked': '#0d8c5c',
+    'recurrent': '#52c69a',
 }
-LEGEND = {'telos': 'telos (algebra-native)', 'fallback': 'telos (algebra-agnostic fallback)',
+LABELS = {'telos': 'telos (algebra-native)', 'fallback': 'telos (algebra-agnostic fallback)',
           'masked': 'STLCG++ (masked)', 'recurrent': 'STLCG++ (recurrent)'}
+METHODS = ('exact', 'lse', 'softmax')
+STYLE = {f'{backend}-{m}': (hue, 'solid') for m in METHODS for backend, hue in HUES.items()}
+LEGEND = {f'{backend}-{m}': label for m in METHODS for backend, label in LABELS.items()}
 CRITICAL = '#d03b3b'  # OOM marker
 
 
