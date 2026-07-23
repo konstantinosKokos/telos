@@ -10,7 +10,6 @@ import torch
 from torch import Tensor
 from torch.nn import Module
 from typing import Any, Callable as Fn
-from torch.nn.functional import pad
 
 
 class Trace:
@@ -54,14 +53,14 @@ class Trace:
     def vmap(self, fn: Fn[[Tensor], Tensor]) -> Trace:
         return Trace(torch.vmap(fn, in_dims=-2, out_dims=-2)(self.values), self.names)
 
-    def to(self, device) -> Trace:
+    def to(self, device: torch.device) -> Trace:
         return Trace(self.values.to(device), self.names)
 
 
 def mkTrace(**vars: Tensor) -> Trace:
-        assert vars, "Trace needs at least one variable."
-        assert len({t.size() for t in vars.values()}) == 1, "Variables must share shape."
-        return Trace(torch.stack(list(vars.values()), dim=-2), tuple(vars.keys()))
+    assert vars, "Trace needs at least one variable."
+    assert len({t.size() for t in vars.values()}) == 1, "Variables must share shape."
+    return Trace(torch.stack(list(vars.values()), dim=-2), tuple(vars.keys()))
 
 
 class Judgement:
@@ -76,32 +75,34 @@ class Judgement:
     def __eq__(self, other: Any):
         return isinstance(other, Judgement) and all((self.trace == other.trace, self.conclusion == other.conclusion))
 
-
-class Model(Module):
-    def __init__(self, algebra: Algebra):
+class Model[T](Module):
+    def __init__(self, algebra: Algebra[T]):
         super().__init__()
         self.algebra = algebra
 
     def forward(self, judgement: Judgement, return_trajectory: bool = False) -> Tensor:
         algebra = self.algebra
 
-        def go(trace: Trace, conclusion: Formula) -> Tensor:
+        def go(trace: Trace, conclusion: Formula) -> T:
             def reshape(result: Tensor) -> Tensor:
                 return result.expand_as(trace.values[..., 0, :])
 
+            def rev(x: T) -> T:
+                return algebra.fmap(x, lambda t: t.flip(-1))
+
             match conclusion:
                 case AbstractTop():
-                    return reshape(algebra.top)
+                    return algebra.fmap(algebra.top, reshape)
                 case AbstractBottom():
-                    return reshape(algebra.bottom)
+                    return algebra.fmap(algebra.bottom, reshape)
                 case Variable(_):
-                    return trace[conclusion]
+                    return algebra.embed(trace[conclusion])
                 case Negation(Until(AbstractTop(), Negation(x))):
-                    return algebra.running_meet(go(trace, x).flip(-1)).flip(-1)
+                    return rev(algebra.running_meet(rev(go(trace, x))))
                 case Negation(x):
                     return algebra.neg(go(trace, x))
                 case Next(x):
-                    return pad(go(trace, x)[..., 1:], pad=(0, 1), value=algebra.bottom)
+                    return algebra.shift(go(trace, x))
                 case Disjunction(l, r):
                     return algebra.join(go(trace, l), go(trace, r))
                 case Conjunction(l, r):
@@ -109,13 +110,13 @@ class Model(Module):
                 case Implies(l, r):
                     return algebra.implies(go(trace, l), go(trace, r))
                 case Until(AbstractTop(), r):
-                    return algebra.running_join(go(trace, r).flip(-1)).flip(-1)
+                    return rev(algebra.running_join(rev(go(trace, r))))
                 case Until(l, r):
                     lss = algebra.span_meet(go(trace, l))
-                    rs = go(trace, r)[..., None, :]
+                    rs = algebra.fmap(go(trace, r), lambda t: t[..., None, :])
                     return algebra.exists(algebra.meet(lss, rs))
                 case _:
                     raise ValueError
 
-        result = go(judgement.trace, judgement.conclusion)
+        result = algebra.readout(go(judgement.trace, judgement.conclusion))
         return result if return_trajectory else result[..., 0]

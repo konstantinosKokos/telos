@@ -1,10 +1,10 @@
 import torch
 from torch import Tensor
 
-from .base import FuzzyBase
+from .base import Fuzzy
 
 
-class Goedel(FuzzyBase):
+class Goedel(Fuzzy):
     def meet(self, x: Tensor, y: Tensor) -> Tensor:
         return torch.minimum(x, y)
 

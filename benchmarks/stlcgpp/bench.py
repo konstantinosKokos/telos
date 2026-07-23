@@ -182,7 +182,7 @@ class FallbackRobustness(Robustness):
     revert to the generic scan/fold derivations from the four primitives.
     This is the path any algebra without closed forms takes (e.g. soft,
     non-associative meets), benchmarked as `fallback`."""
-    from telos.algebras.base import Algebra as _A
+    from telos.algebras.base import TensorAlgebra as _A
     running_meet, running_join = _A.running_meet, _A.running_join
     exists, forall = _A.exists, _A.forall
     span_meet, span_join = _A.span_meet, _A.span_join

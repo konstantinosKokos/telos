@@ -2,10 +2,10 @@ import torch
 from torch import Tensor
 from torch.nn import Parameter
 
-from .base import FuzzyBase
+from .base import Archimedean, Fuzzy
 
 
-class AczelAlsina(FuzzyBase):
+class AczelAlsina(Archimedean, Fuzzy):
     def __init__(self, p: float, trainable: bool, eps: float = 1e-3):
         super().__init__()
         self._p = Parameter(torch.tensor(float(p)), requires_grad=trainable)
@@ -15,35 +15,11 @@ class AczelAlsina(FuzzyBase):
     def p(self) -> Tensor:
         return torch.clamp(self._p, min=self.eps)
 
-    def meet(self, x: Tensor, y: Tensor) -> Tensor:
-        p = self.p
-        a = (-torch.log(torch.clamp(x, min=self.eps))) ** p
-        b = (-torch.log(torch.clamp(y, min=self.eps))) ** p
-        return torch.exp(-(a + b) ** (1 / p))
+    def embed(self, x: Tensor) -> Tensor:
+        return torch.clamp(x, min=self.eps, max=1 - self.eps)
 
-    def join(self, x: Tensor, y: Tensor) -> Tensor:
-        return 1 - self.meet(1 - x, 1 - y)
+    def g(self, x: Tensor) -> Tensor:
+        return (-torch.log(x)) ** self.p
 
-    def implies(self, x: Tensor, y: Tensor) -> Tensor:
-        p = self.p
-        a = (-torch.log(torch.clamp(x, min=self.eps))) ** p
-        b = (-torch.log(torch.clamp(y, min=self.eps))) ** p
-        diff = torch.clamp(b - a, min=0.)
-        r = torch.exp(-diff ** (1 / p))
-        return torch.where(x <= y, self.top.expand_as(r), r)
-
-    def running_meet(self, x: Tensor) -> Tensor:
-        p = self.p
-        cum = torch.cumsum((-torch.log(torch.clamp(x, min=self.eps))) ** p, dim=-1)
-        return torch.exp(-cum ** (1 / p))
-
-    def running_join(self, x: Tensor) -> Tensor:
-        return 1 - self.running_meet(1 - x)
-
-    def forall(self, x: Tensor) -> Tensor:
-        p = self.p
-        s = torch.sum((-torch.log(torch.clamp(x, min=self.eps))) ** p, dim=-1)
-        return torch.exp(-s ** (1 / p))
-
-    def exists(self, x: Tensor) -> Tensor:
-        return 1 - self.forall(1 - x)
+    def g_inv(self, s: Tensor) -> Tensor:
+        return torch.exp(-s ** (1 / self.p))

@@ -1,28 +1,12 @@
 import torch
 from torch import Tensor
 
-from .base import FuzzyBase
+from .base import Archimedean, Fuzzy
 
 
-class Lukasiewicz(FuzzyBase):
-    def meet(self, x: Tensor, y: Tensor) -> Tensor:
-        return torch.clamp(x + y - 1, min=0.)
+class Lukasiewicz(Archimedean, Fuzzy):
+    def g(self, x: Tensor) -> Tensor:
+        return 1 - x
 
-    def join(self, x: Tensor, y: Tensor) -> Tensor:
-        return torch.clamp(x + y, max=1.)
-
-    def implies(self, x: Tensor, y: Tensor) -> Tensor:
-        return torch.minimum(self.top, 1 - x + y)
-
-    def running_meet(self, x: Tensor) -> Tensor:
-        idx = torch.arange(x.size(-1), dtype=x.dtype, device=x.device)
-        return torch.clamp(torch.cumsum(x, dim=-1) - idx, min=0.)
-
-    def running_join(self, x: Tensor) -> Tensor:
-        return torch.clamp(torch.cumsum(x, dim=-1), max=1.)
-
-    def forall(self, x: Tensor) -> Tensor:
-        return torch.clamp(x.sum(dim=-1) - (x.size(-1) - 1), min=0.)
-
-    def exists(self, x: Tensor) -> Tensor:
-        return torch.clamp(x.sum(dim=-1), max=1.)
+    def g_inv(self, s: Tensor) -> Tensor:
+        return torch.clamp(1 - s, min=0.)

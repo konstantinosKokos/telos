@@ -1,27 +1,24 @@
 import torch
 from torch import Tensor
 
-from .base import FuzzyBase
+from .base import Archimedean, Fuzzy
 
 
-class Product(FuzzyBase):
+class Product(Archimedean, Fuzzy):
+    def g(self, x: Tensor) -> Tensor:
+        return -torch.log(x)
+
+    def g_inv(self, s: Tensor) -> Tensor:
+        return torch.exp(-s)
+
     def meet(self, x: Tensor, y: Tensor) -> Tensor:
         return x * y
 
     def join(self, x: Tensor, y: Tensor) -> Tensor:
         return x + y - x * y
 
-    def implies(self, x: Tensor, y: Tensor) -> Tensor:
-        return torch.where(x == 0, self.top, torch.minimum(self.top, y/x))
-
     def running_meet(self, x: Tensor) -> Tensor:
         return torch.cumprod(x, dim=-1)
 
-    def running_join(self, x: Tensor) -> Tensor:
-        return 1 - torch.cumprod(1 - x, dim=-1)
-
     def forall(self, x: Tensor) -> Tensor:
         return torch.prod(x, dim=-1)
-
-    def exists(self, x: Tensor) -> Tensor:
-        return 1 - torch.prod(1 - x, dim=-1)
