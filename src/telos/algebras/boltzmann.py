@@ -71,4 +71,4 @@ class Boltzmann(Lifted[BoltzmannState]):
         )
 
     def readout(self, s: BoltzmannState) -> Tensor:
-        return s.wsum / s.weight
+        return s.wsum / torch.where(s.weight == 0, torch.ones_like(s.weight), s.weight)
