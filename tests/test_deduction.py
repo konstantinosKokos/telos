@@ -13,7 +13,7 @@ from telos.syntax import (
     Negation, Next, Disjunction, Conjunction, Implies, Until,
 )
 from telos.algebras import (
-    Algebra, Boltzmann, Boolean, Goedel, Lukasiewicz, Product, Robustness, Frank,
+    Algebra, Boltzmann, Boolean, Goedel, Lukasiewicz, Mellowmax, Product, Robustness, Frank,
     Hamacher, Yager, SchweizerSklar, AczelAlsina, Dombi, SugenoWeber, LSE,
     KleeneDienes,
 )
@@ -78,6 +78,7 @@ algebras: list[Algebra] = [
     LSE(p=2., trainable=False),
     KleeneDienes(),
     Boltzmann(beta=2., trainable=False),
+    Mellowmax(beta=2., trainable=False),
 ]
 
 phi = (Until(p, q) | ~Next(p)) & always(p > eventually(q))
@@ -110,6 +111,7 @@ parametric: list[tuple[type[Algebra], dict[str, float]]] = [
     (SugenoWeber, dict(p=1.)),
     (LSE, dict(p=2.)),
     (Boltzmann, dict(beta=2.)),
+    (Mellowmax, dict(beta=2.)),
 ]
 
 

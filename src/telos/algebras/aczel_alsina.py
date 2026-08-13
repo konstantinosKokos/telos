@@ -15,9 +15,6 @@ class AczelAlsina(Archimedean, Fuzzy):
     def p(self) -> Tensor:
         return torch.clamp(self._p, min=self.eps)
 
-    def embed(self, x: Tensor) -> Tensor:
-        return torch.clamp(x, min=self.eps, max=1 - self.eps)
-
     def g(self, x: Tensor) -> Tensor:
         return (-torch.log(x)) ** self.p
 

@@ -34,49 +34,38 @@ def span(
     return f
 
 
-class Algebra[T](ABC, Module):
-    top: T
-    bottom: T
+class Algebra(ABC, Module):
+    top: Tensor
+    bottom: Tensor
 
     @abstractmethod
-    def meet(self, x: T, y: T) -> T: ...
+    def meet(self, x: Tensor, y: Tensor) -> Tensor: ...
     @abstractmethod
-    def join(self, x: T, y: T) -> T: ...
+    def join(self, x: Tensor, y: Tensor) -> Tensor: ...
     @abstractmethod
-    def implies(self, x: T, y: T) -> T: ...
+    def implies(self, x: Tensor, y: Tensor) -> Tensor: ...
     @abstractmethod
-    def neg(self, x: T) -> T: ...
+    def neg(self, x: Tensor) -> Tensor: ...
+    
+    @abstractmethod
+    def shift(self, x: Tensor) -> Tensor: ...
 
     @abstractmethod
-    def embed(self, x: Tensor) -> T: ...
+    def running_meet(self, x: Tensor) -> Tensor: ...
     @abstractmethod
-    def readout(self, x: T) -> Tensor: ...
+    def running_join(self, x: Tensor) -> Tensor: ...
     @abstractmethod
-    def shift(self, x: T) -> T: ...
+    def exists(self, x: Tensor) -> Tensor: ...
     @abstractmethod
-    def fmap(self, x: T, fn: Fn[[Tensor], Tensor]) -> T: ...
-
+    def forall(self, x: Tensor) -> Tensor: ...
     @abstractmethod
-    def running_meet(self, x: T) -> T: ...
-    @abstractmethod
-    def running_join(self, x: T) -> T: ...
-    @abstractmethod
-    def exists(self, x: T) -> T: ...
-    @abstractmethod
-    def forall(self, x: T) -> T: ...
-    @abstractmethod
-    def span_meet(self, x: T) -> T: ...
+    def span_meet(self, x: Tensor) -> Tensor: ...
 
 
-class TensorAlgebra(Algebra[Tensor], ABC):
+class Folded(Algebra, ABC):
     @property
     def dtype(self) -> torch.dtype: return self.top.dtype
-
-    def embed(self, x: Tensor) -> Tensor: return x
-    def readout(self, x: Tensor) -> Tensor: return x
     def shift(self, x: Tensor) -> Tensor: return pad(x[..., 1:], pad=(0, 1), value=self.bottom)
-    def fmap(self, x: Tensor, fn: Fn[[Tensor], Tensor]) -> Tensor: return fn(x)
-
     def running_meet(self, x: Tensor) -> Tensor: return scan(self.meet)(x)
     def running_join(self, x: Tensor) -> Tensor: return scan(self.join)(x)
     def exists(self, x: Tensor) -> Tensor: return fold(self.join, self.bottom)(x)
@@ -85,7 +74,8 @@ class TensorAlgebra(Algebra[Tensor], ABC):
     def span_join(self, x: Tensor) -> Tensor: return span(self.running_join, self.bottom, self.bottom)(x)
 
 
-class Fuzzy(TensorAlgebra, ABC):
+
+class Fuzzy(Folded, ABC):
     def __init__(self):
         super().__init__()
         self.register_buffer('top', torch.tensor(1.))
@@ -95,7 +85,7 @@ class Fuzzy(TensorAlgebra, ABC):
         return 1 - x
 
 
-class Archimedean(TensorAlgebra, ABC):
+class Archimedean(Folded, ABC):
     @abstractmethod
     def g(self, x: Tensor) -> Tensor: ...
     @abstractmethod

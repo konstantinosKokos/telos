@@ -10,7 +10,9 @@ from .base import Algebra, Fn, Tensor
 
 class State(ABC):
     @abstractmethod
-    def fmap(self, fn: Fn[[Tensor], Tensor]) -> Self: ...
+    def combine(self, other: Self) -> Self: ...
+    @abstractmethod
+    def neutral(self) -> Self: ...
     @abstractmethod
     def zip_with(self, other: Self, fn: Fn[[Tensor, Tensor], Tensor]) -> Self: ...
     @property
@@ -21,69 +23,42 @@ class State(ABC):
     def device(self) -> torch.device: ...
 
 
-def sweep[S: State](combine: Fn[[S, S], S], neutral: S) -> Fn[[S], S]:
-    def shifted(states: S, k: int) -> S:
-        return states.zip_with(neutral, lambda s, i: torch.cat([i.expand(*s.shape[:-1], k), s[..., :-k]], dim=-1))
+def sweep[S: State](states: S) -> S:
+    def shifted(acc: S, k: int) -> S:
+        def delay(s: Tensor, n: Tensor) -> Tensor:
+            return torch.cat([n.expand(*s.shape[:-1], k), s[..., :-k]], dim=-1)
+        return acc.zip_with(states.neutral(), delay)
 
-    def f(states: S) -> S:
-        ks = takewhile(lambda k: k < states.duration, (1 << j for j in count()))
-        return reduce(lambda acc, k: combine(shifted(acc, k), acc), ks, states)
-    return f
-
-
-def windows[S: State](combine: Fn[[S, S], S], neutral: S) -> Fn[[S], S]:
-    def f(states: S) -> S:
-        n = states.duration
-        mask = torch.triu(torch.ones(n, n, device=states.device)).bool()
-        rows = states.zip_with(neutral, lambda s, i: torch.where(mask, s[..., None, :], i))
-        return sweep(combine, neutral)(rows)
-    return f
+    ks = takewhile(lambda k: k < states.duration, (1 << j for j in count()))
+    return reduce(lambda acc, k: shifted(acc, k).combine(acc), ks, states)
 
 
-class Lifted[S: State](Algebra[S], ABC):
-    @property
+def windows[S: State](states: S) -> S:
+    n = states.duration
+    mask = torch.triu(torch.ones(n, n, device=states.device)).bool()
+    def tile(s: Tensor, i: Tensor) -> Tensor:
+        return torch.where(mask, s[..., None, :], i)
+    return sweep(states.zip_with(states.neutral(), tile))
+
+
+class Lifted[S: State](Algebra, ABC):
     @abstractmethod
-    def neutral(self) -> S: ...
-    @property
-    @abstractmethod
-    def top_value(self) -> Tensor: ...
-    @property
-    @abstractmethod
-    def bottom_value(self) -> Tensor: ...
-    @abstractmethod
-    def combine(self, a: S, b: S) -> S: ...
-    @abstractmethod
-    def embed_meet(self, x: Tensor) -> S: ...
-    @abstractmethod
-    def embed_join(self, x: Tensor) -> S: ...
-    @abstractmethod
-    def negate(self, x: Tensor) -> Tensor: ...
+    def embed(self, x: Tensor) -> S: ...
     @abstractmethod
     def readout(self, x: S) -> Tensor: ...
 
-    @property
-    def top(self) -> S: return self.embed(self.top_value)
-    @property
-    def bottom(self) -> S: return self.embed(self.bottom_value)
+    def shift(self, x: Tensor) -> Tensor: return pad(x[..., 1:], pad=(0, 1), value=self.bottom)
 
-    def embed(self, x: Tensor) -> S: return self.embed_meet(x)
-    def fmap(self, x: S, fn: Fn[[Tensor], Tensor]) -> S: return x.fmap(fn)
-    def shift(self, x: S) -> S: return self.embed(pad(self.readout(x)[..., 1:], pad=(0, 1), value=self.bottom_value))
+    def meet(self, x: Tensor, y: Tensor) -> Tensor: return self.readout(self.embed(x).combine(self.embed(y)))
+    def join(self, x: Tensor, y: Tensor) -> Tensor: return self.neg(self.meet(self.neg(x), self.neg(y)))
+    def implies(self, x: Tensor, y: Tensor) -> Tensor: return self.join(self.neg(x), y)
 
-    def neg(self, x: S) -> S: return self.embed(self.negate(self.readout(x)))
-    def meet(self, x: S, y: S) -> S: return self.combine(self.embed_meet(self.readout(x)), self.embed_meet(self.readout(y)))
-    def join(self, x: S, y: S) -> S: return self.combine(self.embed_join(self.readout(x)), self.embed_join(self.readout(y)))
-    def implies(self, x: S, y: S) -> S: return self.join(self.neg(x), y)
+    def running_meet(self, x: Tensor) -> Tensor: return self.readout(sweep(self.embed(x)))
+    def running_join(self, x: Tensor) -> Tensor: return self.neg(self.running_meet(self.neg(x)))
+    def forall(self, x: Tensor) -> Tensor: return self.running_meet(x)[..., -1]
+    def exists(self, x: Tensor) -> Tensor: return self.running_join(x)[..., -1]
 
-    def running_meet(self, x: S) -> S: return sweep(self.combine, self.neutral)(self.embed_meet(self.readout(x)))
-    def running_join(self, x: S) -> S: return sweep(self.combine, self.neutral)(self.embed_join(self.readout(x)))
-    def forall(self, x: S) -> S: return self.fmap(self.running_meet(x), lambda c: c[..., -1])
-    def exists(self, x: S) -> S: return self.fmap(self.running_join(x), lambda c: c[..., -1])
-
-    def span_meet(self, x: S) -> S:
-        values = self.readout(x)
-        n = x.duration
-        mask = torch.triu(torch.ones(n, n, device=values.device)).bool()
-        swept = windows(self.combine, self.neutral)(self.embed_meet(values))
-        fill = self.embed(self.bottom_value)
-        return swept.zip_with(fill, lambda s, f: torch.where(mask, s, f))
+    def span_meet(self, x: Tensor) -> Tensor:
+        n = x.size(-1)
+        mask = torch.triu(torch.ones(n, n, device=x.device)).bool()
+        return torch.where(mask, self.readout(windows(self.embed(x))), self.bottom)

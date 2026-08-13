@@ -9,7 +9,7 @@ from hypothesis import given, settings, strategies as st
 from hypothesis.extra import numpy as hnp
 
 from telos.algebras import (
-    Algebra, Boltzmann, Boolean, Goedel, Lifted, Lukasiewicz, Product, Robustness, Frank,
+    Algebra, Boltzmann, Boolean, Goedel, Lifted, Lukasiewicz, Mellowmax, Product, Robustness, Frank,
     Hamacher, Yager, SchweizerSklar, AczelAlsina, Dombi, SugenoWeber, LSE,
     KleeneDienes,
 )
@@ -32,45 +32,23 @@ def interval(lo: float, hi: float) -> st.SearchStrategy[torch.Tensor]:
 booleans = hnp.arrays(np.bool_, SHAPE).map(torch.from_numpy)
 
 
-def binary(
-        A: Algebra,
-        op: Fn[[torch.Tensor, torch.Tensor], torch.Tensor]
-) -> Fn[[torch.Tensor, torch.Tensor], torch.Tensor]:
-    if not isinstance(A, Lifted):
-        return op
-    def f(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
-        return A.readout(op(A.embed(x), A.embed(y)))
-    return f
-
-
-def unary(
-        A: Algebra,
-        op: Fn[[torch.Tensor], torch.Tensor]
-) -> Fn[[torch.Tensor], torch.Tensor]:
-    if not isinstance(A, Lifted):
-        return op
-    def f(x: torch.Tensor) -> torch.Tensor:
-        return A.readout(op(A.embed(x)))
-    return f
-
-
 laws = [
-    ('meet_commutative', lambda A, x, y, *_: commutative(binary(A, A.meet))(x, y)),
-    ('join_commutative', lambda A, x, y, *_: commutative(binary(A, A.join))(x, y)),
-    ('meet_associative', lambda A, x, y, z: associative(binary(A, A.meet))(x, y, z)),
-    ('join_associative', lambda A, x, y, z: associative(binary(A, A.join))(x, y, z)),
-    ('meet_idempotent',  lambda A, x, *_: idempotent(binary(A, A.meet))(x)),
-    ('join_idempotent',  lambda A, x, *_: idempotent(binary(A, A.join))(x)),
-    ('absorption',       lambda A, x, y, *_: absorption(binary(A, A.meet), binary(A, A.join))(x, y)),
-    ('distributivity',   lambda A, x, y, z: distributive(binary(A, A.meet), binary(A, A.join))(x, y, z)),
-    ('involutive',       lambda A, x, *_: involutive(unary(A, A.neg))(x)),
-    ('de_morgan',        lambda A, x, y, *_: de_morgan(binary(A, A.meet), binary(A, A.join), unary(A, A.neg))(x, y)),
-    ('complementarity',  lambda A, x, *_: complementary(binary(A, A.meet), binary(A, A.join), unary(A, A.neg), A.readout(A.top), A.readout(A.bottom))(x)),
-    ('residuation',      lambda A, x, y, z: residuated(binary(A, A.meet), binary(A, A.implies))(x, y, z)),
-    ('adjunction',       lambda A, x, y, z: adjoint(binary(A, A.meet), binary(A, A.implies))(x, y, z)),
-    ('monotone',         lambda A, x, y, z: monotone(binary(A, A.meet), binary(A, A.join), unary(A, A.neg))(x, y, z)),
-    ('unital',           lambda A, x, *_: unital(binary(A, A.meet), binary(A, A.join), A.readout(A.top), A.readout(A.bottom))(x)),
-    ('zero_free',        lambda A, x, y, *_: zero_free(binary(A, A.meet), binary(A, A.join), A.readout(A.top), A.readout(A.bottom))(x, y)),
+    ('meet_commutative', lambda A, x, y, *_: commutative(A.meet)(x, y)),
+    ('join_commutative', lambda A, x, y, *_: commutative(A.join)(x, y)),
+    ('meet_associative', lambda A, x, y, z: associative(A.meet)(x, y, z)),
+    ('join_associative', lambda A, x, y, z: associative(A.join)(x, y, z)),
+    ('meet_idempotent',  lambda A, x, *_: idempotent(A.meet)(x)),
+    ('join_idempotent',  lambda A, x, *_: idempotent(A.join)(x)),
+    ('absorption',       lambda A, x, y, *_: absorption(A.meet, A.join)(x, y)),
+    ('distributivity',   lambda A, x, y, z: distributive(A.meet, A.join)(x, y, z)),
+    ('involutive',       lambda A, x, *_: involutive(A.neg)(x)),
+    ('de_morgan',        lambda A, x, y, *_: de_morgan(A.meet, A.join, A.neg)(x, y)),
+    ('complementarity',  lambda A, x, *_: complementary(A.meet, A.join, A.neg, A.top, A.bottom)(x)),
+    ('residuation',      lambda A, x, y, z: residuated(A.meet, A.implies)(x, y, z)),
+    ('adjunction',       lambda A, x, y, z: adjoint(A.meet, A.implies)(x, y, z)),
+    ('monotone',         lambda A, x, y, z: monotone(A.meet, A.join, A.neg)(x, y, z)),
+    ('unital',           lambda A, x, *_: unital(A.meet, A.join, A.top, A.bottom)(x)),
+    ('zero_free',        lambda A, x, y, *_: zero_free(A.meet, A.join, A.top, A.bottom)(x, y)),
 ]
 
 strict = {'meet_idempotent', 'join_idempotent', 'absorption', 'distributivity', 'complementarity'}
@@ -95,6 +73,10 @@ instances: list[tuple[Algebra, set[str], st.SearchStrategy[torch.Tensor]]] = [
     (Boltzmann(beta=2., trainable=False),
      {'meet_associative', 'join_associative', 'absorption', 'distributivity',
       'complementarity', 'residuation', 'monotone', 'adjunction'},
+     interval(-10., 10.)),
+    (Mellowmax(beta=2., trainable=False),
+     {'meet_associative', 'join_associative', 'absorption', 'distributivity',
+      'complementarity', 'residuation', 'adjunction'},
      interval(-10., 10.)),
 ]
 instances = [(A.double(), fails, carrier) for A, fails, carrier in instances]
@@ -148,7 +130,7 @@ def test_exemptions_witnessed():
 
 
 def observed[S](A: Lifted[S], s: S, probe: S) -> tuple[Tensor, Tensor]:
-    return A.readout(s), A.readout(A.combine(s, probe))
+    return A.readout(s), A.readout(s.combine(probe))
 
 
 def states_close[S](A: Lifted[S], a: S, b: S, probe: S) -> bool:
@@ -157,19 +139,19 @@ def states_close[S](A: Lifted[S], a: S, b: S, probe: S) -> bool:
 
 def combine_associative(A: Lifted, x: Tensor, y: Tensor, z: Tensor, w: Tensor) -> bool:
     a, b, c = A.embed(x), A.embed(y), A.embed(z)
-    return states_close(A, A.combine(A.combine(a, b), c), A.combine(a, A.combine(b, c)), A.embed(w))
+    return states_close(A, a.combine(b).combine(c), a.combine(b.combine(c)), A.embed(w))
 
 
 def neutral_identity(A: Lifted, x: Tensor, y: Tensor, z: Tensor, *_: Tensor) -> bool:
-    s, probe = A.combine(A.embed(x), A.embed(y)), A.embed(z)
+    s, probe = A.embed(x).combine(A.embed(y)), A.embed(z)
     return all(
-        (states_close(A, A.combine(A.neutral, s), s, probe),
-         states_close(A, A.combine(s, A.neutral), s, probe))
+        (states_close(A, s.neutral().combine(s), s, probe),
+         states_close(A, s.combine(s.neutral()), s, probe))
     )
 
 
 def section(A: Lifted, x: Tensor, *_: Tensor) -> bool:
-    return close(A.readout(A.embed_meet(x)), x) and close(A.readout(A.embed_join(x)), x)
+    return close(A.readout(A.embed(x)), x)
 
 
 state_laws = [
@@ -180,6 +162,7 @@ state_laws = [
 
 lifted_instances: list[tuple[Lifted, st.SearchStrategy[torch.Tensor]]] = [
     (Boltzmann(beta=2., trainable=False).double(), interval(-10., 10.)),
+    (Mellowmax(beta=2., trainable=False).double(), interval(-10., 10.)),
 ]
 
 
@@ -188,6 +171,15 @@ state_params = pytest.mark.parametrize(
     [(A, carrier, name, predicate) for A, carrier in lifted_instances for name, predicate in state_laws],
     ids=[f'{type(A).__name__}-{name}' for A, _ in lifted_instances for name, _ in state_laws],
 )
+
+
+@pytest.mark.parametrize('A', [A for A, _ in lifted_instances], ids=lambda a: type(a).__name__)
+def test_neutral_readout_finite(A: Lifted):
+    assert A.readout(A.embed(A.top).neutral()).isfinite().all()
+
+
+def test_lifted_licenses():
+    assert all(not ({'involutive', 'de_morgan'} & fails) for A, fails, _ in instances if isinstance(A, Lifted))
 
 
 @state_params

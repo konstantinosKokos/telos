@@ -194,7 +194,7 @@ class FallbackRobustness(Robustness):
     revert to the generic scan/fold derivations from the four primitives.
     This is the path any algebra without closed forms takes (e.g. soft,
     non-associative meets), benchmarked as `fallback`."""
-    from telos.algebras.base import TensorAlgebra as _A
+    from telos.algebras.base import Folded as _A
     running_meet, running_join = _A.running_meet, _A.running_join
     exists, forall = _A.exists, _A.forall
     span_meet, span_join = _A.span_meet, _A.span_join
@@ -318,7 +318,20 @@ CRITICAL = '#d03b3b'  # OOM marker
 def plot(rows: list[dict], title: str, total_gb: float | None = None):
     import math
     import matplotlib.pyplot as plt
+    from matplotlib.legend_handler import HandlerLine2D
     ink, ink2, muted, grid_c = '#0b0b0b', '#52514e', '#898781', '#e1e0d9'
+
+    class HandlerOOM(HandlerLine2D):
+        # the OOM handle mirrors what the plot draws: the dashed continuation ending in the red x.
+        # The stock handler marks the midpoint of its line, which would leave a dash dangling past
+        # the x, so draw the segment here and mark only its last point.
+        def create_artists(self, legend, orig_handle, xdescent, ydescent,
+                           width, height, fontsize, trans):
+            x0, x1 = -xdescent, -xdescent + width - fontsize * 0.45
+            line = plt.Line2D([x0, x1], [(height - ydescent) / 2] * 2, markevery=[-1])
+            self.update_prop(line, orig_handle, legend)
+            line.set_transform(trans)
+            return [line]
 
     def pts(formula, impl, key):
         sel = [(r['T'], r[key]) for r in rows
@@ -375,13 +388,14 @@ def plot(rows: list[dict], title: str, total_gb: float | None = None):
             ax.set_ylabel('peak allocated, GB', color=ink2, fontsize=9.5)
     handles = [plt.Line2D([], [], color=STYLE[i][0], ls=STYLE[i][1], lw=2,
                           marker='o', ms=4, label=LEGEND[i]) for i in present]
-    handles.append(plt.Line2D([], [], color=CRITICAL, ls='none',
-                              marker='x', ms=8, mew=2.5, label='OOM'))
+    oom_handle = plt.Line2D([], [], color=muted, lw=1.5, ls=(0, (2, 3)), marker='x',
+                            mec=CRITICAL, mew=2.5, ms=8, label='OOM')
+    handles.append(oom_handle)
     leg = fig.legend(handles=handles, loc='upper left', ncol=len(handles), frameon=False,
                      fontsize=9, bbox_to_anchor=(0.01, 0.985), handlelength=2.6,
-                     columnspacing=1.4)
+                     columnspacing=1.4, handler_map={oom_handle: HandlerOOM()})
     for text, h in zip(leg.get_texts(), handles):
-        text.set_color(h.get_color())
+        text.set_color(CRITICAL if h is oom_handle else h.get_color())
     fig.suptitle(title, color=ink, fontsize=11, x=0.02, ha='left', y=1.005)
     fig.tight_layout(rect=(0, 0, 1, 0.955))
     return fig

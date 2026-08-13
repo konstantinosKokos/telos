@@ -8,15 +8,15 @@ from functools import reduce
 from itertools import accumulate
 
 from telos.algebras import (
-    Archimedean, Boltzmann, Boolean, Goedel, Lifted, Lukasiewicz, Product, Robustness, Frank,
+    Archimedean, Boltzmann, Boolean, Goedel, Lifted, Lukasiewicz, Mellowmax, Product, Robustness, Frank,
     Hamacher, Yager, SchweizerSklar, AczelAlsina, Dombi, SugenoWeber, LSE,
-    KleeneDienes, State, TensorAlgebra,
+    KleeneDienes, State, Folded,
 )
 from telos.algebras.base import scan, fold, span
 from telos.algebras.properties import generated
 
 
-algebras: list[TensorAlgebra] = [
+algebras: list[Folded] = [
     Boolean(),
     Goedel(),
     Lukasiewicz(),
@@ -34,7 +34,7 @@ algebras: list[TensorAlgebra] = [
 ]
 batch, time = 4, 12
 
-checks: list[tuple[str, Fn[[TensorAlgebra], Fn[[Tensor], Tensor]]]] = [
+checks: list[tuple[str, Fn[[Folded], Fn[[Tensor], Tensor]]]] = [
     ('running_meet', lambda A: scan(A.meet)),
     ('running_join', lambda A: scan(A.join)),
     ('forall',       lambda A: fold(A.meet, A.top)),
@@ -64,10 +64,10 @@ def grad(out: Tensor, x: Tensor) -> Tensor:
 @pytest.mark.parametrize('A', algebras, ids=lambda a: type(a).__name__)
 @pytest.mark.parametrize('name, reference', checks, ids=[c[0] for c in checks])
 def test_override(
-        A: TensorAlgebra,
+        A: Folded,
         samples: dict[torch.dtype, Tensor],
         name: str,
-        reference: Fn[[TensorAlgebra], Fn[[Tensor], Tensor]]):
+        reference: Fn[[Folded], Fn[[Tensor], Tensor]]):
     x = samples[A.dtype].clone().requires_grad_(A.dtype.is_floating_point)
     override, spec = getattr(A, name)(x), reference(A)(x)
     assert close(override, spec)
@@ -83,26 +83,20 @@ def test_generated(A: Archimedean, samples: dict[torch.dtype, Tensor]):
 
 lifted: list[Lifted] = [
     Boltzmann(beta=2., trainable=False),
+    Mellowmax(beta=2., trainable=False),
 ]
 
 
-def ticks[S: State](A: Lifted[S], states: S) -> list[S]:
-    return [A.fmap(states, lambda c, i=i: c[..., i]) for i in range(states.duration)]
-
-
-lifted_checks: list[tuple[str, str]] = [
-    ('running_meet', 'embed_meet'),
-    ('running_join', 'embed_join'),
-]
+def ticks[S: State](A: Lifted[S], x: Tensor) -> list[S]:
+    return [A.embed(x[..., i]) for i in range(x.size(-1))]
 
 
 @pytest.mark.parametrize('A', lifted, ids=lambda a: type(a).__name__)
-@pytest.mark.parametrize('name, side', lifted_checks, ids=[c[0] for c in lifted_checks])
-def test_lifted_override(A: Lifted, name: str, side: str):
+def test_lifted_override(A: Lifted):
     torch.manual_seed(0)
     x = (torch.rand(batch, time) * 20 - 10).requires_grad_(True)
-    override = A.readout(getattr(A, name)(A.embed(x)))
-    spec = torch.stack([A.readout(s) for s in accumulate(ticks(A, getattr(A, side)(x)), A.combine)], dim=-1)
+    override = A.running_meet(x)
+    spec = torch.stack([A.readout(s) for s in accumulate(ticks(A, x), lambda a, b: a.combine(b))], dim=-1)
     assert close(override, spec)
     assert close(grad(override, x), grad(spec, x))
 
@@ -111,10 +105,10 @@ def test_lifted_override(A: Lifted, name: str, side: str):
 def test_lifted_span(A: Lifted):
     torch.manual_seed(0)
     x = torch.rand(batch, time) * 20 - 10
-    windows = A.readout(A.span_meet(A.embed(x)))
-    parts = ticks(A, A.embed_meet(x))
+    windows = A.span_meet(x)
+    parts = ticks(A, x)
     for t in range(time):
         for u in range(time):
-            reference = (A.readout(reduce(A.combine, parts[t:u + 1])) if u >= t
-                         else A.bottom_value.expand(batch))
+            reference = (A.readout(reduce(lambda a, b: a.combine(b), parts[t:u + 1])) if u >= t
+                         else A.bottom.expand(batch))
             assert close(windows[..., t, u], reference)

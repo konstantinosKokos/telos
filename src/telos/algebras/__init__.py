@@ -1,6 +1,7 @@
-from .base import Algebra, TensorAlgebra, Archimedean
+from .base import Algebra, Folded, Fuzzy, Archimedean
 from .lifted import State, Lifted
 from .boltzmann import Boltzmann
+from .mellowmax import Mellowmax
 from .goedel import Goedel
 from .boolean import Boolean
 from .product import Product

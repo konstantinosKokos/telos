@@ -75,30 +75,27 @@ class Judgement:
     def __eq__(self, other: Any):
         return isinstance(other, Judgement) and all((self.trace == other.trace, self.conclusion == other.conclusion))
 
-class Model[T](Module):
-    def __init__(self, algebra: Algebra[T]):
+class Model(Module):
+    def __init__(self, algebra: Algebra):
         super().__init__()
         self.algebra = algebra
 
     def forward(self, judgement: Judgement, return_trajectory: bool = False) -> Tensor:
         algebra = self.algebra
 
-        def go(trace: Trace, conclusion: Formula) -> T:
+        def go(trace: Trace, conclusion: Formula) -> Tensor:
             def reshape(result: Tensor) -> Tensor:
                 return result.expand_as(trace.values[..., 0, :])
 
-            def rev(x: T) -> T:
-                return algebra.fmap(x, lambda t: t.flip(-1))
-
             match conclusion:
                 case AbstractTop():
-                    return algebra.fmap(algebra.top, reshape)
+                    return reshape(algebra.top)
                 case AbstractBottom():
-                    return algebra.fmap(algebra.bottom, reshape)
+                    return reshape(algebra.bottom)
                 case Variable(_):
-                    return algebra.embed(trace[conclusion])
+                    return trace[conclusion]
                 case Negation(Until(AbstractTop(), Negation(x))):
-                    return rev(algebra.running_meet(rev(go(trace, x))))
+                    return algebra.running_meet(go(trace, x).flip(-1)).flip(-1)
                 case Negation(x):
                     return algebra.neg(go(trace, x))
                 case Next(x):
@@ -110,13 +107,12 @@ class Model[T](Module):
                 case Implies(l, r):
                     return algebra.implies(go(trace, l), go(trace, r))
                 case Until(AbstractTop(), r):
-                    return rev(algebra.running_join(rev(go(trace, r))))
+                    return algebra.running_join(go(trace, r).flip(-1)).flip(-1)
                 case Until(l, r):
                     lss = algebra.span_meet(go(trace, l))
-                    rs = algebra.fmap(go(trace, r), lambda t: t[..., None, :])
-                    return algebra.exists(algebra.meet(lss, rs))
+                    return algebra.exists(algebra.meet(lss, go(trace, r)[..., None, :]))
                 case _:
                     raise ValueError
 
-        result = algebra.readout(go(judgement.trace, judgement.conclusion))
+        result = go(judgement.trace, judgement.conclusion)
         return result if return_trajectory else result[..., 0]
