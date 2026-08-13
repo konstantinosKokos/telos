@@ -21,9 +21,15 @@ cross-algebra comparisons that go beyond empirical benchmarking.
 ## Installation
 Requires Python `≥ 3.12` and torch `≥ 2.0`.
 
+Latest release:
 ```bash
-pip install -e .            # core library
-pip install -e ".[test]"    # plus pytest, hypothesis, numpy
+pip install git+https://github.com/konstantinosKokos/telos.git@v0.1.0
+```
+
+Or from a local clone:
+```bash
+pip install -e .          # core library
+pip install -e ".[test]"  # plus pytest, hypothesis, numpy
 ```
 
 ## Project Structure

@@ -12,9 +12,15 @@ license = "MIT"
 authors = [
     { name = "Konstantinos Kogkalidis" }
 ]
+keywords = ["linear temporal logic", "fuzzy logic", "differentiable logic", "pytorch", "neurosymbolic"]
 dependencies = [
     "torch>=2.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/konstantinosKokos/telos"
+Repository = "https://github.com/konstantinosKokos/telos"
+Issues = "https://github.com/konstantinosKokos/telos/issues"
 
 [project.optional-dependencies]
 test = ["pytest", "hypothesis", "numpy"]
