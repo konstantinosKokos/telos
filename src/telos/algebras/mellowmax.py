@@ -71,5 +71,8 @@ class Mellowmax(Lifted[MellowmaxState]):
     def readout(self, s: MellowmaxState) -> Tensor:
         live = s.count > 0
         one = torch.ones_like(s.weight)
-        tilted = s.max + torch.log(torch.where(live, s.weight, one)) - torch.log(torch.where(live, s.count, one))
+        zero = torch.zeros_like(s.max)
+        tilted = (torch.where(live, s.max, zero)
+                  + torch.log(torch.where(live, s.weight, one))
+                  - torch.log(torch.where(live, s.count, one)))
         return torch.where(live, tilted / -self.beta, self.top)
